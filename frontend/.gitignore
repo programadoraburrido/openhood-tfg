@@ -1,0 +1,27 @@
+# Dependencias de Node
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Archivos de entorno (¡AQUÍ IRÁN LAS CLAVES DE LA IA, NUNCA SUBIR!)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+
+# Builds del Frontend
+dist/
+build/
+frontend/dist/
+
+# Archivos del Sistema y Editores
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
