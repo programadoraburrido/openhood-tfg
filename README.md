@@ -3,7 +3,7 @@
 OpenHood es una aplicacion web de gestion vehicular que ayuda al usuario mediante herramientas inteligentes, incluyendo un asistente de diagnostico y un analizador comparativo de presupuestos para optimizar el mantenimiento y el gasto del vehiculo.
 
 ## Equipo de Desarrollo (IES El Cañaveral)
-* Jose Manuel Perron Bravo: Identidad y Garaje (Usuarios, Vehiculos, Contexto IA).
+* Jose Manuel Ferron Bravo: Identidad y Garaje (Usuarios, Vehiculos, Contexto IA).
 * Roberto Sanchez: Operativa Financiera (Presupuestos, Reparaciones, IA Comparador).
 * Facundo Sola Milencoff: Asistencia y Mercado (Buscador Talleres, Chatbot IA).
 
