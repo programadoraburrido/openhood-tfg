@@ -1,0 +1,88 @@
+generator client {
+  provider   = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// ==========================================
+// PARTE DE JOSE Y FACUNDO (Contexto necesario)
+// ==========================================
+
+model Usuario {
+  id        Int        @id @default(autoincrement())
+  nombre    String
+  email     String     @unique
+  telefono  String?
+  vehiculos Vehiculo[]
+}
+
+model Vehiculo {
+  matricula    String       @id
+  marca        String
+  modelo       String
+  kilometraje  Int
+  
+  usuarioId    Int
+  usuario      Usuario      @relation(fields: [usuarioId], references: [id])
+  
+  piezas       Pieza[]      // Relación N:M
+  reparaciones Reparacion[] // Relación 1:N
+}
+
+model Taller {
+  id           Int          @id @default(autoincrement())
+  nombre       String
+  reparaciones Reparacion[] // Relación 1:N
+}
+
+model Pieza {
+  id                 Int          @id @default(autoincrement())
+  nombre             String
+  categoria          String
+  fecha_instalacion  DateTime
+  vida_util_estimada Int
+  
+  vehiculos          Vehiculo[]   // Relación N:M
+  reparaciones       Reparacion[] // Relación N:M
+}
+
+// ==========================================
+// TU PARTE: OPERATIVA FINANCIERA (ROBERTO)
+// ==========================================
+
+model Reparacion {
+  id                  Int      @id @default(autoincrement())
+  fecha               DateTime
+  descripcion         String
+  taller_nombre       String   // Según diagrama
+  kilometraje_momento Int
+
+  // Relación con Vehiculo (N a 1)
+  vehiculoMatricula   String
+  vehiculo            Vehiculo @relation(fields: [vehiculoMatricula], references: [matricula])
+
+  // Relación con Taller (N a 1)
+  tallerId            Int?
+  taller              Taller?  @relation(fields: [tallerId], references: [id])
+
+  // Relación con Pieza (N a M) - Prisma crea la tabla intermedia automáticamente
+  piezas              Pieza[]
+
+  // Relación con Presupuesto (1 a 1)
+  presupuesto         Presupuesto?
+}
+
+model Presupuesto {
+  id             Int    @id @default(autoincrement())
+  importe_total  Float
+  base_imponible Float
+  IVA            Float
+  url_pdf        String?
+
+  // Relación 1 a 1 con Reparación
+  reparacionId   Int        @unique
+  reparacion     Reparacion @relation(fields: [reparacionId], references: [id])
+}
