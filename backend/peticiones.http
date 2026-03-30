@@ -1,0 +1,17 @@
+### 1. Comprobar que la API vive
+GET http://localhost:3000/
+
+### 2. Obtener todas las reparaciones (GET)
+GET http://localhost:3000/api/reparaciones
+
+### 3. Crear una nueva reparación (POST)
+POST http://localhost:3000/api/reparaciones
+Content-Type: application/json
+
+{
+  "fecha": "2026-03-30T10:00:00Z",
+  "descripcion": "Cambio de pastillas de freno y aceite",
+  "taller_nombre": "Talleres Paco",
+  "kilometraje_momento": 144000,
+  "vehiculoMatricula": "1234 CDD"
+}
