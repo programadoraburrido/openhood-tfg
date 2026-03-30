@@ -11,6 +11,8 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
+const presupuestosRoutes = require('./routes/presupuestos.routes');
+
 // ==========================================
 // REGISTRO DE RUTAS DE LA API
 // ==========================================
@@ -20,6 +22,7 @@ app.get('/', (req, res) => {
 
 // Todas las peticiones que empiecen por /api/reparaciones irán a tu archivo de rutas
 app.use('/api/reparaciones', reparacionesRoutes);
+app.use('/api/presupuestos', presupuestosRoutes);
 
 
 // Levantar el servidor
