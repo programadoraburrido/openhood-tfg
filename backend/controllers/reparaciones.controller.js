@@ -70,7 +70,8 @@ const eliminarReparacion = async (req, res) => {
 // 5. Obtener reparaciones de un vehículo concreto
 const obtenerReparacionesPorVehiculo = async (req, res) => {
   try {
-    const { matricula } = req.params;
+    let { matricula } = req.params;
+    matricula = matricula.replace(/\s+/g, '').toUpperCase(); // Quita espacios y pone mayúsculas
 
     const reparaciones = await prisma.reparacion.findMany({
       where: { 

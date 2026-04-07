@@ -14,10 +14,10 @@ Content-Type: application/json
 
 {
   "fecha": "2026-03-30T10:00:00Z",
-  "descripcion": "Cambio de correa distribución",
-  "taller_nombre": "Talleres Peter",
+  "descripcion": "Cambio de aceite",
+  "taller_nombre": "Talleres Paco",
   "kilometraje_momento": 286000,
-  "vehiculoMatricula": "1234 CCC"
+  "vehiculoMatricula": "1234CCC"
 }
 
 ### 3. Actualizar una reparación (PUT)
@@ -33,7 +33,7 @@ Content-Type: application/json
 DELETE http://localhost:3000/api/reparaciones/27
 
 ### 5. Buscar el historial de un coche por matrícula (GET)
-GET http://localhost:3000/api/reparaciones/vehiculo/1234 CCC
+GET http://localhost:3000/api/reparaciones/vehiculo/1234CCC
 
 ####################
 ##  PRESUPUESTOS  ##
