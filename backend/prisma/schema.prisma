@@ -84,5 +84,5 @@ model Presupuesto {
 
   // Relación 1 a 1 con Reparación
   reparacionId   Int        @unique
-  reparacion     Reparacion @relation(fields: [reparacionId], references: [id])
+  reparacion     Reparacion @relation(fields: [reparacionId], references: [id], onDelete: Cascade)
 }

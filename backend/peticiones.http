@@ -1,31 +1,64 @@
-### 1. Comprobar que la API vive
+### Comprobar que la API vive
 GET http://localhost:3000/
 
-### 2. Obtener todas las reparaciones (GET)
+####################
+##  REPARACIONES  ##
+####################
+
+### 1. Obtener todas las reparaciones (GET)
 GET http://localhost:3000/api/reparaciones
 
-### 3. Crear una nueva reparación (POST)
+### 2. Crear una nueva reparación (POST)
 POST http://localhost:3000/api/reparaciones
 Content-Type: application/json
 
 {
   "fecha": "2026-03-30T10:00:00Z",
-  "descripcion": "Cambio de pastillas de freno y aceite",
-  "taller_nombre": "Talleres Paco",
-  "kilometraje_momento": 144000,
-  "vehiculoMatricula": "1234 CDD"
+  "descripcion": "Cambio de correa distribución",
+  "taller_nombre": "Talleres Peter",
+  "kilometraje_momento": 286000,
+  "vehiculoMatricula": "1234 CCC"
 }
 
-### 4. Crear un presupuesto asociado a la reparación 1 (POST)
+### 3. Actualizar una reparación (PUT)
+PUT http://localhost:3000/api/reparaciones/22
+Content-Type: application/json
+
+{
+  "kilometraje_momento": 110000,
+  "descripcion": "Cambio de pastillas, aceite y filtros nuevos"
+}
+
+### 4. Eliminar una reparación (DELETE)
+DELETE http://localhost:3000/api/reparaciones/27
+
+### 5. Buscar el historial de un coche por matrícula (GET)
+GET http://localhost:3000/api/reparaciones/vehiculo/1234 CCC
+
+####################
+##  PRESUPUESTOS  ##
+####################
+
+### 1. Ver todos los presupuestos con su reparación (GET)
+GET http://localhost:3000/api/presupuestos
+
+### 2. Crear un presupuesto automatizado (POST)
 POST http://localhost:3000/api/presupuestos
 Content-Type: application/json
 
 {
-  "importe_total": 182.10,
-  "base_imponible": 150.50,
-  "IVA": 31.60,
-  "reparacionId": 21
+  "base_imponible": 400.00,
+  "reparacionId": 27
 }
 
-### 5. Ver todos los presupuestos con su reparación (GET)
-GET http://localhost:3000/api/presupuestos
+### 3. Actualizar un presupuesto (PUT)
+PUT http://localhost:3000/api/presupuestos/9
+Content-Type: application/json
+
+{
+  "base_imponible": 300.00
+}
+
+### 4. Eliminar un presupuesto (DELETE)
+DELETE http://localhost:3000/api/presupuestos/12
+
