@@ -1,6 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+// 1. Crear presupuesto en base a un id de reparacion
 const crearPresupuesto = async (req, res) => {
   try {
     
@@ -30,6 +31,7 @@ const crearPresupuesto = async (req, res) => {
   }
 };
 
+// 2. Obtener presupuestos 
 const obtenerPresupuestos = async (req, res) => {
   try {
     const presupuestos = await prisma.presupuesto.findMany({
@@ -44,6 +46,7 @@ const obtenerPresupuestos = async (req, res) => {
   }
 };
 
+// 3. Actualizar presupuesto.
 const actualizarPresupuesto = async (req, res) => {
   try {
     const { id } = req.params;
@@ -75,6 +78,7 @@ const actualizarPresupuesto = async (req, res) => {
   }
 };
 
+// 4. Borrar presupuesto por id
 const eliminarPresupuesto = async (req, res) => {
   try {
     const { id } = req.params;
@@ -90,10 +94,39 @@ const eliminarPresupuesto = async (req, res) => {
   }
 };
 
+// 5. Subir PDF del presupuesto
+const subirPdf = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // Si el middleware de Multer no ha procesado ningún archivo salta error 400
+    if (!req.file) {
+      return res.status(400).json({ error: 'No se ha subido ningún archivo PDF' });
+    }
+
+    // Creamos la ruta pública que guardaremos en la BD
+    const urlPdf = `/uploads/${req.file.filename}`;
+
+    const presupuestoActualizado = await prisma.presupuesto.update({
+      where: { id: parseInt(id) },
+      data: { url_pdf: urlPdf },
+    });
+
+    res.json({
+      mensaje: 'PDF subido y vinculado correctamente',
+      presupuesto: presupuestoActualizado
+    });
+  } catch (error) {
+    console.error("Error al vincular el PDF:", error);
+    res.status(500).json({ error: 'Error interno al guardar el documento' });
+  }
+};
+
 
 module.exports = {
   crearPresupuesto,
   obtenerPresupuestos,
   actualizarPresupuesto,
-  eliminarPresupuesto
+  eliminarPresupuesto,
+  subirPdf
 };

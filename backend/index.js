@@ -24,6 +24,9 @@ app.get('/', (req, res) => {
 app.use('/api/reparaciones', reparacionesRoutes);
 app.use('/api/presupuestos', presupuestosRoutes);
 
+// Se hace visible la carpeta.
+app.use('/uploads', express.static('uploads'));
+
 
 // Levantar el servidor
 app.listen(PORT, () => {

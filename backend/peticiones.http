@@ -48,7 +48,7 @@ Content-Type: application/json
 
 {
   "base_imponible": 400.00,
-  "reparacionId": 27
+  "reparacionId": 29
 }
 
 ### 3. Actualizar un presupuesto (PUT)
@@ -61,4 +61,17 @@ Content-Type: application/json
 
 ### 4. Eliminar un presupuesto (DELETE)
 DELETE http://localhost:3000/api/presupuestos/12
+
+### 5. Subir PDF a un presupuesto (Multipart Form)
+### Debemos crear un presupuesto asignado a una reparacion, cambiamos el id
+### y en la base de datos se comprueba que la url_pdf ha cambiado
+POST http://localhost:3000/api/presupuestos/16/pdf
+Content-Type: multipart/form-data; boundary=MiLimiteDeArchivo
+
+--MiLimiteDeArchivo
+Content-Disposition: form-data; name="archivo"; filename="prueba.pdf"
+Content-Type: application/pdf
+
+< holiwisssssssssssssss
+--MiLimiteDeArchivo--
 
