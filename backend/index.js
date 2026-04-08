@@ -1,21 +1,34 @@
 const express = require('express');
 const cors = require('cors');
 require('dotenv').config();
-const { PrismaClient } = require('@prisma/client');
+
+// Importamos las rutas
+const reparacionesRoutes = require('./routes/reparaciones.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// En Prisma 6 esto funciona sin problemas
-const prisma = new PrismaClient();
-
 app.use(cors());
 app.use(express.json());
 
+const presupuestosRoutes = require('./routes/presupuestos.routes');
+
+// ==========================================
+// REGISTRO DE RUTAS DE LA API
+// ==========================================
 app.get('/', (req, res) => {
-  res.send('¡API de OpenHood funcionando con Prisma 6!');
+  res.send('¡API de OpenHood funcionando perfectamente!');
 });
 
+// Todas las peticiones que empiecen por /api/reparaciones irán a tu archivo de rutas
+app.use('/api/reparaciones', reparacionesRoutes);
+app.use('/api/presupuestos', presupuestosRoutes);
+
+// Se hace visible la carpeta.
+app.use('/uploads', express.static('uploads'));
+
+
+// Levantar el servidor
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
