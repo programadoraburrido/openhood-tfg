@@ -4,14 +4,14 @@ require('dotenv').config();
 
 // Importamos las rutas
 const reparacionesRoutes = require('./routes/reparaciones.routes');
+const presupuestosRoutes = require('./routes/presupuestos.routes');
+const authRoutes = require('./routes/auth.routes'); 
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
-
-const presupuestosRoutes = require('./routes/presupuestos.routes');
 
 // ==========================================
 // REGISTRO DE RUTAS DE LA API
@@ -20,13 +20,13 @@ app.get('/', (req, res) => {
   res.send('¡API de OpenHood funcionando perfectamente!');
 });
 
-// Todas las peticiones que empiecen por /api/reparaciones irán a tu archivo de rutas
+// Todas las peticiones que empiecen por /api/... irán a su archivo de rutas
 app.use('/api/reparaciones', reparacionesRoutes);
 app.use('/api/presupuestos', presupuestosRoutes);
+app.use('/api/auth', authRoutes); 
 
-// Se hace visible la carpeta.
+// Se hace visible la carpeta (Esto te vendrá de lujo luego para las fotos de los vehículos con Multer)
 app.use('/uploads', express.static('uploads'));
-
 
 // Levantar el servidor
 app.listen(PORT, () => {

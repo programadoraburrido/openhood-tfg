@@ -75,3 +75,18 @@ Content-Type: application/pdf
 < holiwisssssssssssssss
 --MiLimiteDeArchivo--
 
+####################
+## IDENTIDAD (JOSE) ##
+####################
+
+### 1. Registrar un nuevo usuario (POST)
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "nombre": "Jose",
+  "email": "jose@openhood.com",
+  "telefono": "600123456",
+  "password": "miPasswordSegura123"
+}
+

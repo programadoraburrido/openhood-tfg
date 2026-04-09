@@ -16,19 +16,20 @@ model Usuario {
   nombre    String
   email     String     @unique
   telefono  String?
+  password  String     
   vehiculos Vehiculo[]
 }
 
 model Vehiculo {
-  matricula    String       @id
-  marca        String
-  modelo       String
-  kilometraje  Int
+  matricula   String       @id
+  marca       String
+  modelo      String
+  kilometraje Int
+  fotoUrl     String?      
+  usuarioId   Int
+  usuario     Usuario      @relation(fields: [usuarioId], references: [id])
   
-  usuarioId    Int
-  usuario      Usuario      @relation(fields: [usuarioId], references: [id])
-  
-  piezas       Pieza[]      // Relación N:M
+  piezas      Pieza[]      // Relación N:M
   reparaciones Reparacion[] // Relación 1:N
 }
 
