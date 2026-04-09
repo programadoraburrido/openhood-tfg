@@ -4,6 +4,8 @@ require('dotenv').config();
 
 // Importamos las rutas
 const reparacionesRoutes = require('./routes/reparaciones.routes');
+const presupuestosRoutes = require('./routes/presupuestos.routes');
+const comparadorIARoutes = require('./routes/comparadorIA.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -11,20 +13,19 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 
-const presupuestosRoutes = require('./routes/presupuestos.routes');
-
 // ==========================================
 // REGISTRO DE RUTAS DE LA API
 // ==========================================
+
 app.get('/', (req, res) => {
   res.send('¡API de OpenHood funcionando perfectamente!');
 });
 
-// Todas las peticiones que empiecen por /api/reparaciones irán a tu archivo de rutas
 app.use('/api/reparaciones', reparacionesRoutes);
 app.use('/api/presupuestos', presupuestosRoutes);
+app.use('/api/comparador', comparadorIARoutes);
 
-// Se hace visible la carpeta.
+// Hace visible la carpeta. Aqui se guardaran los PDFs.
 app.use('/uploads', express.static('uploads'));
 
 

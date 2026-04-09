@@ -15,9 +15,9 @@ Content-Type: application/json
 {
   "fecha": "2026-03-30T10:00:00Z",
   "descripcion": "Cambio de aceite",
-  "taller_nombre": "Talleres Paco",
-  "kilometraje_momento": 286000,
-  "vehiculoMatricula": "1234CCC"
+  "taller_nombre": "Talleres Pedro",
+  "kilometraje_momento": 226000,
+  "vehiculoMatricula": "1234BBB"
 }
 
 ### 3. Actualizar una reparación (PUT)
@@ -30,7 +30,7 @@ Content-Type: application/json
 }
 
 ### 4. Eliminar una reparación (DELETE)
-DELETE http://localhost:3000/api/reparaciones/27
+DELETE http://localhost:3000/api/reparaciones/31
 
 ### 5. Buscar el historial de un coche por matrícula (GET)
 GET http://localhost:3000/api/reparaciones/vehiculo/1234CCC
@@ -75,3 +75,9 @@ Content-Type: application/pdf
 < holiwisssssssssssssss
 --MiLimiteDeArchivo--
 
+####################
+##  COMPARADOR IA  ##
+####################
+
+### 1. Analizar Presupuesto con Inteligencia Artificial (GET)
+GET http://localhost:3000/api/comparador/16/analizar
