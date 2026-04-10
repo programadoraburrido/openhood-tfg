@@ -99,3 +99,21 @@ Content-Type: application/json
   "password": "miPasswordSegura123"
 }
 
+
+
+### Obtener mis vehículos
+GET http://localhost:3000/api/vehiculos
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqb3NlQG9wZW5ob29kLmNvbSIsImlhdCI6MTc3NTgxMTAyOSwiZXhwIjoxNzc1ODk3NDI5fQ.6zhGNuzu68FFP8a4fRgUPN7QakYBvaHCqWz0X5RYLcY
+
+### Crear un vehículo (USA ESTE TOKEN)
+POST http://localhost:3000/api/vehiculos
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqb3NlQG9wZW5ob29kLmNvbSIsImlhdCI6MTc3NTgxMTAyOSwiZXhwIjoxNzc1ODk3NDI5fQ.6zhGNuzu68FFP8a4fRgUPN7QakYBvaHCqWz0X5RYLcY
+
+{
+  "matricula": "7788KFC",
+  "marca": "Seat",
+  "modelo": "Ibiza",
+  "año": 2018,
+  "kilometraje": 85000
+}

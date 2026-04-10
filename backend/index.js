@@ -32,3 +32,9 @@ app.use('/uploads', express.static('uploads'));
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en http://localhost:${PORT}`);
 });
+
+// Arriba con los imports
+const vehiculoRoutes = require('./routes/vehiculo.routes');
+
+// Abajo con los app.use
+app.use('/api/vehiculos', vehiculoRoutes);

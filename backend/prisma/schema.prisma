@@ -24,6 +24,7 @@ model Vehiculo {
   matricula   String       @id
   marca       String
   modelo      String
+  anio        Int
   kilometraje Int
   fotoUrl     String?      
   usuarioId   Int
