@@ -1,36 +1,27 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
+// CREAR
 const crearVehiculo = async (req, res) => {
   try {
-    // Recibimos 'año' del frontend pero lo guardaremos como 'anio' en la BD
     const { matricula, marca, modelo, año, kilometraje } = req.body;
-    const usuarioId = req.user.id; 
-
     const nuevoVehiculo = await prisma.vehiculo.create({
       data: {
-        matricula: matricula,
-        marca: marca,
-        modelo: modelo,
-        anio: parseInt(año), // Mapeo de 'año' a 'anio'
+        matricula,
+        marca,
+        modelo,
+        anio: parseInt(año),
         kilometraje: parseInt(kilometraje),
-        usuarioId: usuarioId
+        usuarioId: req.user.id
       }
     });
-
-    res.status(201).json({ 
-      mensaje: 'Vehículo añadido correctamente al garaje', 
-      vehiculo: nuevoVehiculo 
-    });
+    res.status(201).json({ mensaje: 'Vehículo añadido', vehiculo: nuevoVehiculo });
   } catch (error) {
-    console.error("Error al crear vehículo:", error);
-    res.status(500).json({ 
-      mensaje: 'No se pudo crear el vehículo', 
-      error: error.message 
-    });
+    res.status(500).json({ mensaje: 'Error al crear', error: error.message });
   }
 };
 
+// LISTAR TODOS LOS DEL USUARIO
 const obtenerMisVehiculos = async (req, res) => {
   try {
     const vehiculos = await prisma.vehiculo.findMany({
@@ -38,8 +29,52 @@ const obtenerMisVehiculos = async (req, res) => {
     });
     res.json(vehiculos);
   } catch (error) {
-    res.status(500).json({ mensaje: 'Error al obtener los vehículos' });
+    res.status(500).json({ mensaje: 'Error al obtener vehículos' });
   }
 };
 
-module.exports = { crearVehiculo, obtenerMisVehiculos };
+// VER UNO SOLO (POR MATRÍCULA)
+const obtenerVehiculoPorMatricula = async (req, res) => {
+  try {
+    const vehiculo = await prisma.vehiculo.findFirst({
+      where: { 
+        matricula: req.params.matricula,
+        usuarioId: req.user.id // Seguridad: que sea mío
+      }
+    });
+    if (!vehiculo) return res.status(404).json({ mensaje: 'Vehículo no encontrado' });
+    res.json(vehiculo);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al obtener el vehículo' });
+  }
+};
+
+// BORRAR
+const eliminarVehiculo = async (req, res) => {
+  try {
+    // Verificamos que el coche existe y es del usuario antes de borrar
+    const vehiculo = await prisma.vehiculo.findFirst({
+      where: { 
+        matricula: req.params.matricula,
+        usuarioId: req.user.id 
+      }
+    });
+
+    if (!vehiculo) return res.status(404).json({ mensaje: 'No puedes borrar un coche que no es tuyo o no existe' });
+
+    await prisma.vehiculo.delete({
+      where: { matricula: req.params.matricula }
+    });
+
+    res.json({ mensaje: 'Vehículo eliminado correctamente' });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al eliminar. Puede que tenga reparaciones asociadas.' });
+  }
+};
+
+module.exports = { 
+  crearVehiculo, 
+  obtenerMisVehiculos, 
+  obtenerVehiculoPorMatricula, 
+  eliminarVehiculo 
+};
