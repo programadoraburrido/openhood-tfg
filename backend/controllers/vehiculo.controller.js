@@ -71,10 +71,45 @@ const eliminarVehiculo = async (req, res) => {
     res.status(500).json({ mensaje: 'Error al eliminar. Puede que tenga reparaciones asociadas.' });
   }
 };
+// ACTUALIZAR (UPDATE)
+const actualizarVehiculo = async (req, res) => {
+  try {
+    const { marca, modelo, año, kilometraje } = req.body;
+    const { matricula } = req.params;
+
+    // 1. Verificamos si el coche existe y es del usuario
+    const vehiculoExistente = await prisma.vehiculo.findFirst({
+      where: { 
+        matricula: matricula,
+        usuarioId: req.user.id 
+      }
+    });
+
+    if (!vehiculoExistente) {
+      return res.status(404).json({ mensaje: 'No puedes editar un vehículo que no te pertenece o no existe' });
+    }
+
+    // 2. Actualizamos
+    const vehiculoActualizado = await prisma.vehiculo.update({
+      where: { matricula: matricula },
+      data: {
+        marca: marca || vehiculoExistente.marca,
+        modelo: modelo || vehiculoExistente.modelo,
+        anio: año ? parseInt(año) : vehiculoExistente.anio,
+        kilometraje: kilometraje ? parseInt(kilometraje) : vehiculoExistente.kilometraje
+      }
+    });
+
+    res.json({ mensaje: 'Vehículo actualizado con éxito', vehiculo: vehiculoActualizado });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al actualizar el vehículo', error: error.message });
+  }
+};
 
 module.exports = { 
   crearVehiculo, 
   obtenerMisVehiculos, 
   obtenerVehiculoPorMatricula, 
-  eliminarVehiculo 
+  eliminarVehiculo,
+  actualizarVehiculo 
 };
