@@ -75,3 +75,67 @@ Content-Type: application/pdf
 < holiwisssssssssssssss
 --MiLimiteDeArchivo--
 
+####################
+## IDENTIDAD (JOSE) ##
+####################
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqb3NlQG9wZW5ob29kLmNvbSIsImlhdCI6MTc3NTgxMTAyOSwiZXhwIjoxNzc1ODk3NDI5fQ.6zhGNuzu68FFP8a4fRgUPN7QakYBvaHCqWz0X5RYLcY
+
+### 1. Registrar un nuevo usuario (POST)
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "nombre": "Jose",
+  "email": "jose@openhood.com",
+  "telefono": "600123456",
+  "password": "miPasswordSegura123"
+}
+
+### Login de usuario
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "jose@openhood.com",
+  "password": "miPasswordSegura123"
+}
+
+
+
+### Obtener mis vehículos
+GET http://localhost:3000/api/vehiculos
+Authorization: Bearer {{token}}
+### Crear un vehículo (USA ESTE TOKEN)
+POST http://localhost:3000/api/vehiculos
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "matricula": "7788KFC",
+  "marca": "Seat",
+  "modelo": "Ibiza",
+  "año": 2018,
+  "kilometraje": 85000
+}
+
+### Listar todos mis coches
+GET http://localhost:3000/api/vehiculos
+Authorization: Bearer {{token}}
+
+### Ver un coche específico 
+GET http://localhost:3000/api/vehiculos/7784KFC
+Authorization: Bearer {{token}}
+
+### Borrar un coche
+DELETE http://localhost:3000/api/vehiculos/7788KFC
+Authorization: Bearer {{token}}
+
+### Probar el UPDATE (Actualizar kilometraje y modelo)
+PUT http://localhost:3000/api/vehiculos/7788KFC
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "kilometraje": 95000,
+  "modelo": "Ibiza FR"
+}
