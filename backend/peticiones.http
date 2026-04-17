@@ -16,10 +16,10 @@ Authorization: Bearer {{token}}
 
 {
   "fecha": "2026-03-30T10:00:00Z",
-  "descripcion": "Cambio de aceite",
+  "descripcion": "Cambio de bombilla de cruce",
   "taller_nombre": "Talleres Pedro",
-  "kilometraje_momento": 226000,
-  "vehiculoMatricula": "1234BBB"
+  "kilometraje_momento": 228000,
+  "vehiculoMatricula": "7788KFC"
 }
 
 ### 3. Actualizar una reparación (PUT)
@@ -55,17 +55,17 @@ Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "base_imponible": 400.00,
-  "reparacionId": 29
+  "base_imponible": 270.00,
+  "reparacionId": 6
 }
 
 ### 3. Actualizar un presupuesto (PUT)
-PUT http://localhost:3000/api/presupuestos/9
+PUT http://localhost:3000/api/presupuestos/1
 Content-Type: application/json
 Authorization: Bearer {{token}}
 
 {
-  "base_imponible": 300.00
+  "base_imponible": 490.00
 }
 
 ### 4. Eliminar un presupuesto (DELETE)
@@ -91,14 +91,14 @@ Content-Type: application/pdf
 ####################
 
 ### 1. Analizar Presupuesto con Inteligencia Artificial (GET)
-GET http://localhost:3000/api/comparador/16/analizar
+GET http://localhost:3000/api/comparador/2/analizar
 Authorization: Bearer {{token}}
 
 ####################
 ## IDENTIDAD (JOSE) ##
 ####################
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqb3NlQG9wZW5ob29kLmNvbSIsImlhdCI6MTc3NjA4NDczMCwiZXhwIjoxNzc2MTcxMTMwfQ.R_5VTVdWINJnPrfAgWc6XIrTX2plvoBDELo-15NjGhs
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqb3NlQG9wZW5ob29kLmNvbSIsImlhdCI6MTc3NjA5Mzc4NywiZXhwIjoxNzc2MTgwMTg3fQ.Rz5Z_y6o6GXA9FeDgaMqcJ4klQScuvm_KcgXlUsY26s
 
 ### 1. Registrar un nuevo usuario (POST)
 POST http://localhost:3000/api/auth/register

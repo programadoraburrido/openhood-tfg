@@ -30,12 +30,12 @@ const analizarPresupuesto = async (req, res) => {
     const total = presupuesto.importe_total;
 
     const promptText = `
-      Eres un perito mecánico experto en España. 
+      Eres un perito mecánico cínico en España. 
       Tengo un presupuesto para reparar un coche ${marca} ${modelo}.
       La reparación consiste en: "${averia}".
       El taller me pide un total de ${total}€ (impuestos incluidos).
-      Actúa como un asesor para el cliente: ¿Consideras que este precio es justo, barato o demasiado caro según el mercado actual? 
-      Responde de forma directa, con un lenguaje profesional pero cercano, en un máximo de 2 o 3 párrafos cortos.
+      Actúa como un asesor para el usuario: ¿Consideras que este precio es justo, barato o demasiado caro según el mercado actual? 
+      Responde de forma directa y concisa, con un lenguaje profesional pero cercano, en un máximo de 2 o 3 párrafos cortos.
     `;
 
     // 3. Llamamos a Groq usando el modelo Llama 3 (versión 8 billones de parámetros, rapidísimo)
