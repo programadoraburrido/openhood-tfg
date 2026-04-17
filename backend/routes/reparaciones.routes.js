@@ -1,16 +1,17 @@
 const express = require('express');
 const router = express.Router();
 const reparacionesController = require('../controllers/reparaciones.controller');
+const verificarToken = require('../middlewares/auth.middleware');
 
 // Rutas base.
-router.get('/', reparacionesController.obtenerReparaciones);
-router.post('/', reparacionesController.crearReparacion);
+router.get('/', verificarToken, reparacionesController.obtenerReparaciones);
+router.post('/', verificarToken, reparacionesController.crearReparacion);
 
 // Rutas busqueda específica.
-router.get('/vehiculo/:matricula', reparacionesController.obtenerReparacionesPorVehiculo);
+router.get('/vehiculo/:matricula', verificarToken, reparacionesController.obtenerReparacionesPorVehiculo);
 
 // Rutas con ID.
-router.put('/:id', reparacionesController.actualizarReparacion);
-router.delete('/:id', reparacionesController.eliminarReparacion);
+router.put('/:id', verificarToken, reparacionesController.actualizarReparacion);
+router.delete('/:id', verificarToken, reparacionesController.eliminarReparacion);
 
 module.exports = router;
