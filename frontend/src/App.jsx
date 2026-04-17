@@ -6,7 +6,7 @@ function App() {
     <BrowserRouter>
       <Routes>
         
-        <Route path="/historial" element={<HistorialVehiculo />} />
+        <Route path="/historial/:matricula" element={<HistorialVehiculo />} />
         
       </Routes>
     </BrowserRouter>
