@@ -2,14 +2,14 @@ const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 const Groq = require('groq-sdk');
 
-// Inicializamos Groq con tu clave del .env
+// Inicializamos Groq con la clave del .env
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 const analizarPresupuesto = async (req, res) => {
   try {
     const { id } = req.params; 
 
-    // 1. Buscamos el presupuesto exacto igual que antes
+    // 1. Buscamos el presupuesto
     const presupuesto = await prisma.presupuesto.findUnique({
       where: { id: parseInt(id) },
       include: {
@@ -23,7 +23,7 @@ const analizarPresupuesto = async (req, res) => {
       return res.status(404).json({ error: 'Presupuesto no encontrado en la base de datos' });
     }
 
-    // 2. Preparamos el Prompt (Tu lógica de negocio se mantiene intacta)
+    // 2. Preparamos el Prompt
     const marca = presupuesto.reparacion.vehiculo.marca;
     const modelo = presupuesto.reparacion.vehiculo.modelo;
     const averia = presupuesto.reparacion.descripcion;
@@ -38,7 +38,7 @@ const analizarPresupuesto = async (req, res) => {
       Responde de forma directa y concisa, con un lenguaje profesional pero cercano, en un máximo de 2 o 3 párrafos cortos.
     `;
 
-    // 3. Llamamos a Groq usando el modelo Llama 3 (versión 8 billones de parámetros, rapidísimo)
+    // 3. Llamamos a Groq
     const chatCompletion = await groq.chat.completions.create({
       messages: [
         {
@@ -46,7 +46,7 @@ const analizarPresupuesto = async (req, res) => {
           content: promptText,
         },
       ],
-      model: "llama-3.1-8b-instant",
+      model: "llama-3.3-70b-versatile",
     });
 
     const respuestaIA = chatCompletion.choices[0]?.message?.content || "No se pudo generar una respuesta.";

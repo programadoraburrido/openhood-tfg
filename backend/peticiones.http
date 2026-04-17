@@ -98,7 +98,7 @@ Authorization: Bearer {{token}}
 ## IDENTIDAD (JOSE) ##
 ####################
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqb3NlQG9wZW5ob29kLmNvbSIsImlhdCI6MTc3NjA5Mzc4NywiZXhwIjoxNzc2MTgwMTg3fQ.Rz5Z_y6o6GXA9FeDgaMqcJ4klQScuvm_KcgXlUsY26s
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqb3NlQG9wZW5ob29kLmNvbSIsImlhdCI6MTc3NjQyNDc2NiwiZXhwIjoxNzc2NTExMTY2fQ.Ad595Zv7VbIhZdLTyAaMKR8QnQFaWH_BsOq1quOmnM0
 
 ### 1. Registrar un nuevo usuario (POST)
 POST http://localhost:3000/api/auth/register
