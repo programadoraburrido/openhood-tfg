@@ -38,7 +38,7 @@ Authorization: Bearer {{token}}
 
 
 ### 5. Buscar el historial de un coche por matrícula (GET)
-GET http://localhost:3000/api/reparaciones/vehiculo/1234CCC
+GET http://localhost:3000/api/reparaciones/vehiculo/7788KFC
 Authorization: Bearer {{token}}
 
 ####################
@@ -98,7 +98,7 @@ Authorization: Bearer {{token}}
 ## IDENTIDAD (JOSE) ##
 ####################
 
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqb3NlQG9wZW5ob29kLmNvbSIsImlhdCI6MTc3NjQyNDc2NiwiZXhwIjoxNzc2NTExMTY2fQ.Ad595Zv7VbIhZdLTyAaMKR8QnQFaWH_BsOq1quOmnM0
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqb3NlQG9wZW5ob29kLmNvbSIsImlhdCI6MTc3NjQzMTc1MSwiZXhwIjoxNzc2NTE4MTUxfQ.TT6iVLauWryPSw0n_0iRCoeMxeM-CsDcE_UqjJfnn_k
 
 ### 1. Registrar un nuevo usuario (POST)
 POST http://localhost:3000/api/auth/register
