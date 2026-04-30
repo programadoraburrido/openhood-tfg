@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
 
-// Añadimos 'reparacionAEditar' a las props que recibe
 const FormularioReparacion = ({ isOpen, onClose, matricula, onSuccess, reparacionAEditar }) => {
     const [descripcion, setDescripcion] = useState('');
     const [kilometraje, setKilometraje] = useState('');
@@ -10,25 +9,21 @@ const FormularioReparacion = ({ isOpen, onClose, matricula, onSuccess, reparacio
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
 
-    // Este useEffect se dispara cada vez que abrimos el modal
     useEffect(() => {
         if (isOpen) {
             if (reparacionAEditar) {
-                // MODO EDICIÓN: Rellenamos los campos con los datos existentes
                 setDescripcion(reparacionAEditar.descripcion);
                 setKilometraje(reparacionAEditar.kilometraje_momento);
                 setTaller_nombre(reparacionAEditar.taller_nombre || '');
-                // Formateamos la fecha de la BBDD para que el input type="date" la entienda
                 const dateObj = new Date(reparacionAEditar.fecha);
                 setFecha(dateObj.toISOString().split('T')[0]);
             } else {
-                // MODO CREACIÓN: Limpiamos los campos y ponemos la fecha de hoy
                 setDescripcion('');
                 setKilometraje('');
                 setTaller_nombre('');
                 setFecha(new Date().toISOString().split('T')[0]);
             }
-            setError(null); // Limpiamos errores antiguos
+            setError(null);
         }
     }, [isOpen, reparacionAEditar]);
 
@@ -49,10 +44,8 @@ const FormularioReparacion = ({ isOpen, onClose, matricula, onSuccess, reparacio
             };
 
             if (reparacionAEditar) {
-                // Si estamos editando, hacemos un PUT apuntando al ID de la reparación
                 await api.put(`/reparaciones/${reparacionAEditar.id}`, datosParaBackend);
             } else {
-                // Si estamos creando, hacemos un POST normal
                 await api.post('/reparaciones', datosParaBackend);
             }
             
@@ -70,7 +63,6 @@ const FormularioReparacion = ({ isOpen, onClose, matricula, onSuccess, reparacio
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex justify-center items-center p-4">
             <div className="bg-white rounded-xl shadow-2xl max-w-md w-full overflow-hidden">
                 <div className="bg-blue-600 p-4 flex justify-between items-center">
-                    {/* El título cambia dinámicamente */}
                     <h3 className="text-lg font-bold text-white">
                         {reparacionAEditar ? 'Editar Reparación' : 'Nueva Reparación'}
                     </h3>
@@ -83,7 +75,7 @@ const FormularioReparacion = ({ isOpen, onClose, matricula, onSuccess, reparacio
                     {error && <div className="bg-red-100 text-red-700 p-3 rounded text-sm">{error}</div>}
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Descripción de la Avería</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Descripción de la Reparación</label>
                         <textarea 
                             required
                             value={descripcion}
@@ -129,9 +121,6 @@ const FormularioReparacion = ({ isOpen, onClose, matricula, onSuccess, reparacio
                     </div>
 
                     <div className="pt-4 flex justify-end gap-3">
-                        <button type="button" onClick={onClose} className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md transition">
-                            Cancelar
-                        </button>
                         <button type="submit" disabled={loading} className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition disabled:bg-blue-400">
                             {loading ? 'Guardando...' : (reparacionAEditar ? 'Actualizar' : 'Guardar')}
                         </button>

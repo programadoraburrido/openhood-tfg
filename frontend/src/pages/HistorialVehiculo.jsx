@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import api from '../services/api';
 import FormularioReparacion from '../components/FormularioReparacion';
+import FormularioPresupuesto from '../components/FormularioPresupuesto';
 
 const HistorialVehiculo = () => {
   const { matricula } = useParams();
@@ -13,7 +14,12 @@ const HistorialVehiculo = () => {
   const [modalActualizarReparacion, setModalActualizarReparacion] = useState(null);
   const [analizandoId, setAnalizandoId] = useState(null);
   const [modalIA, setModalIA] = useState({ isOpen: false, contenido: '' });
+  const [modalError, setModalError] = useState({ isOpen: false, mensaje: '' });
   const [reparacionABorrar, setReparacionABorrar] = useState(null);
+  const [modalPresupuestoOpen, setModalPresupuestoOpen] = useState(false);
+  const [modalActualizarPresupuesto, setModalActualizarPresupuesto] = useState(null);
+  const [reparacionIdActiva, setReparacionIdActiva] = useState(null);
+  const [presupuestoABorrar, setPresupuestoABorrar] = useState(null);
 
   useEffect(() => {
     const cargarDatos = async () => {
@@ -41,8 +47,11 @@ const HistorialVehiculo = () => {
       const response = await api.get(`/comparador/${presupuestoId}/analizar`);
       setModalIA({ isOpen: true, contenido: response.data.veredicto_ia });
     } catch (error) {
-      console.error("Error al analizar:", error);
-      alert("El perito está descansando ahora mismo.");
+      console.error("Error al analizar. Contacta con soporte técnico", error);
+      setModalError({ 
+        isOpen: true, 
+        mensaje: "El perito está descansando ahora mismo. Por favor, inténtalo de nuevo en unos minutos." 
+      });
     } finally {
       setAnalizandoId(null);
     }
@@ -65,9 +74,27 @@ const HistorialVehiculo = () => {
     }
   };
 
+  const confirmarBorradoPresupuesto = async () => {
+    if (!presupuestoABorrar) return;
+
+    try {
+      await api.delete(`/presupuestos/${presupuestoABorrar}`);
+      setHistorial(historial.map(rep => {
+          if (rep.presupuesto?.id === presupuestoABorrar) {
+              return { ...rep, presupuesto: null };
+          }
+          return rep;
+      }));
+      setPresupuestoABorrar(null);
+    } catch (error) {
+      console.error("Error al borrar presupuesto:", error);
+      alert("Hubo un error al intentar borrar el presupuesto.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 p-8 relative">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-5xl mx-auto">
         
         {/* CABECERA */}
         <div className="bg-white p-6 rounded-lg shadow-md mb-8 border-l-4 border-blue-600 flex justify-between items-center">
@@ -77,7 +104,7 @@ const HistorialVehiculo = () => {
             </h1>
             {vehiculo && (
                 <h3 className="text-lg text-gray-500 mt-2 font-medium flex items-center gap-2">
-                    <span>{vehiculo.marca} {vehiculo.modelo} • {matricula}</span>
+                    <span>{vehiculo.marca} {vehiculo.modelo} • {matricula} • {vehiculo.kilometraje} Km</span>
                 </h3>
             )}
           </div>
@@ -85,7 +112,7 @@ const HistorialVehiculo = () => {
           {/* Botón Maestro para CREAR REPARACIÓN */}
           <button 
             onClick={() => {
-                setModalActualizarReparacion(null); // Nos aseguramos de que va vacío
+                setModalActualizarReparacion(null);
                 setModalCrearReparacionOpen(true); 
             }}
             className="bg-blue-500 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition flex items-center gap-2 shadow-sm"
@@ -118,10 +145,10 @@ const HistorialVehiculo = () => {
                 <div className="flex gap-2">
                   <button 
                     onClick={() => {
-                        setModalActualizarReparacion(reparacion); // Le pasamos los datos para editar
+                        setModalActualizarReparacion(reparacion); 
                         setModalCrearReparacionOpen(true);
                     }} 
-                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition group"
+                    className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition group"  title="Editar Reparación"
                   >
                     <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
                       className="transition-transform duration-200 group-hover:-rotate-12 group-hover:scale-110">
@@ -129,7 +156,7 @@ const HistorialVehiculo = () => {
                       <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
                     </svg>
                   </button>
-                  <button onClick={() => intentarBorrar(reparacion.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition"
+                  <button onClick={() => intentarBorrar(reparacion.id)} className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" title='Borrar Reparación'
                     onMouseEnter={e => {
                       const svg = e.currentTarget.querySelector('svg');
                       svg.classList.remove('animate-shake');
@@ -162,8 +189,38 @@ const HistorialVehiculo = () => {
                             </div>
                             
                             <div className="flex items-center gap-3">
-                                <button onClick={() => alert('Editar Presupuesto')} className="text-sm text-gray-500 hover:text-blue-600">Editar</button>
-                                <button onClick={() => alert('Borrar Presupuesto')} className="text-sm text-gray-500 hover:text-red-600">Borrar</button>
+                                <button onClick={() => {
+                                    setReparacionIdActiva(reparacion.id);
+                                    setModalActualizarPresupuesto(reparacion.presupuesto);
+                                    setModalPresupuestoOpen(true);
+                                }} 
+                                className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition group"
+                                    title="Editar Presupuesto">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                                        className="transition-transform duration-200 group-hover:-rotate-12 group-hover:scale-110">
+                                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                    </svg>
+                                </button>
+                                <button onClick={() => setPresupuestoABorrar(reparacion.presupuesto.id)} 
+                                className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition"
+                                    title="Borrar Presupuesto"
+                                    onMouseEnter={e => {
+                                        const svg = e.currentTarget.querySelector('svg');
+                                        svg.classList.remove('animate-shake');
+                                        void svg.offsetWidth;
+                                        svg.classList.add('animate-shake');
+                                    }}
+                                    onMouseLeave={e => e.currentTarget.querySelector('svg').classList.remove('animate-shake')}
+                                >
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <polyline points="3,6 5,6 21,6"/>
+                                        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                        <path d="M10 11v6"/>
+                                        <path d="M14 11v6"/>
+                                        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                    </svg>
+                                </button>
                                 
                                 <button 
                                     onClick={() => analizarPresupuesto(reparacion.presupuesto.id)}
@@ -173,7 +230,7 @@ const HistorialVehiculo = () => {
                                             ? 'bg-gray-200 text-gray-500 cursor-not-allowed' 
                                             : 'bg-purple-600 text-white hover:bg-purple-700 shadow-sm'}`}
                                 >
-                                    {analizandoId === reparacion.presupuesto.id ? 'Peritando...' : '🤖 Consultar Perito IA'}
+                                    {analizandoId === reparacion.presupuesto.id ? 'Peritando...' : 'Peritación IA'}
                                 </button>
                             </div>
                         </>
@@ -181,7 +238,11 @@ const HistorialVehiculo = () => {
                         <div className="w-full flex justify-between items-center">
                             <span className="text-gray-500 italic">No hay presupuesto asociado.</span>
                             <button 
-                                onClick={() => alert('Abrir formulario para Crear Presupuesto')}
+                                onClick={() => {
+                                    setReparacionIdActiva(reparacion.id);
+                                    setModalActualizarPresupuesto(null);
+                                    setModalPresupuestoOpen(true);
+                                }}
                                 className="bg-green-100 text-green-700 px-4 py-2 rounded-md hover:bg-green-200 transition font-medium text-sm"
                             >
                                 + Añadir Presupuesto
@@ -197,13 +258,14 @@ const HistorialVehiculo = () => {
 
       </div>
 
+      {/* MODAL DE PERITACIÓN IA*/}
       {modalIA.isOpen && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center p-4">
             <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden transform transition-all">
                 
                 <div className="bg-purple-600 p-4 flex justify-between items-center">
                     <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                        🤖 Veredicto del Perito
+                        Veredicto del Perito
                     </h3>
                     <button 
                         onClick={() => setModalIA({ isOpen: false, contenido: '' })}
@@ -218,22 +280,11 @@ const HistorialVehiculo = () => {
                         {modalIA.contenido}
                     </div>
                 </div>
-
-                <div className="bg-gray-50 p-4 flex justify-end">
-                    <button 
-                        onClick={() => setModalIA({ isOpen: false, contenido: '' })}
-                        className="bg-gray-200 text-gray-800 px-4 py-2 rounded-md hover:bg-gray-300 transition font-medium"
-                    >
-                        Cerrar peritaje
-                    </button>
-                </div>
             </div>
         </div>
       )}
 
-      {/* ========================================= */}
-      {/* MODAL DE CONFIRMACIÓN DE BORRADO */}
-      {/* ========================================= */}
+      {/* MODAL DE CONFIRMACIÓN DE BORRADO DE REPARACIÓN */}
       {reparacionABorrar && (
         <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center p-4">
           <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden text-center p-6 transform transition-all animate-fade-in-up">
@@ -278,6 +329,82 @@ const HistorialVehiculo = () => {
             window.location.reload(); 
         }}
       />
+
+      {/* MODAL PARA CREAR/EDITAR PRESUPUESTO */}
+      <FormularioPresupuesto 
+        isOpen={modalPresupuestoOpen} 
+        onClose={() => setModalPresupuestoOpen(false)} 
+        reparacionId={reparacionIdActiva}
+        presupuestoAEditar={modalActualizarPresupuesto} 
+        onSuccess={() => {
+            window.location.reload(); 
+        }}
+      />
+
+      {/* MODAL DE CONFIRMACIÓN DE BORRADO DE PRESUPUESTO */}
+      {presupuestoABorrar && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden text-center p-6 transform transition-all animate-fade-in-up">
+            
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+            
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">¿Eliminar presupuesto?</h3>
+            <p className="text-gray-500 mb-8 text-sm px-2">
+              Esta acción no se puede deshacer. Se eliminarán los datos financieros asociados a esta reparación.
+            </p>
+            
+            <div className="flex gap-3 justify-center">
+              <button 
+                onClick={() => setPresupuestoABorrar(null)}
+                className="px-4 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition font-medium w-full"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={confirmarBorradoPresupuesto}
+                className="px-4 py-2.5 text-white bg-red-600 hover:bg-red-700 rounded-xl transition font-medium w-full shadow-sm flex justify-center items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                Sí, eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE ERROR */}
+      {modalError.isOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden text-center p-6 transform transition-all animate-fade-in-up">
+            
+            {/* Icono de Error (Exclamación) */}
+            <div className="w-20 h-20 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-5 border-4 border-red-100">
+              <svg className="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </svg>
+            </div>
+            
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">¡Ups! Algo salió mal</h3>
+            <p className="text-gray-500 mb-8 text-sm px-2">
+              {modalError.mensaje}
+            </p>
+            
+            {/* Botón para cerrar */}
+            <div className="flex justify-center">
+              <button 
+                onClick={() => setModalError({ isOpen: false, mensaje: '' })}
+                className="px-4 py-2.5 text-white bg-slate-800 hover:bg-slate-900 rounded-xl transition font-medium w-full shadow-sm"
+              >
+                Entendido
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );
