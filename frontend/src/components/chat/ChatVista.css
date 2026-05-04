@@ -1,0 +1,143 @@
+/* Contenedor Principal Flotante */
+.contenedor-chat {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 350px;
+  height: 500px; /* Altura cuando está abierto */
+  background: white;
+  border-radius: 15px 15px 0 0;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+  display: flex;
+  flex-direction: column;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 9999;
+  border: 1px solid #e5e7eb;
+}
+
+/* Estado Minimizado */
+.contenedor-chat.minimizado {
+  height: 55px;
+  width: 280px;
+  overflow: hidden;
+}
+
+/* Cabecera Estilo Moderno */
+.cabecera-chat {
+  background: #2563eb;
+  color: white;
+  padding: 12px 15px;
+  border-radius: 14px 14px 0 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+.titulo-seccion {
+  display: flex;
+  align-items: center;
+}
+
+.titulo-seccion h3 {
+  margin: 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+/* Cuerpo del Chat */
+.cuerpo-chat {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Burbujas Optimizadas */
+.burbuja {
+  max-width: 85%;
+  padding: 10px 14px;
+  border-radius: 18px;
+  font-size: 0.9rem;
+  line-height: 1.4;
+  position: relative;
+}
+
+.burbuja.user {
+  align-self: flex-end;
+  background: #2563eb;
+  color: white;
+  border-bottom-right-radius: 4px;
+}
+
+.burbuja.assistant {
+  align-self: flex-start;
+  background: #ffffff;
+  color: #1e293b;
+  border-bottom-left-radius: 4px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+}
+
+/* Formulario Inferior */
+.formulario-chat {
+  display: flex;
+  padding: 12px;
+  background: white;
+  border-top: 1px solid #f1f5f9;
+}
+
+.formulario-chat input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid #e2e8f0;
+  border-radius: 20px;
+  outline: none;
+  font-size: 0.9rem;
+}
+
+.formulario-chat button {
+  background: #2563eb;
+  color: white;
+  border: none;
+  padding: 0 15px;
+  margin-left: 8px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background 0.2s;
+}
+
+.formulario-chat button:hover {
+  background: #1d4ed8;
+}
+
+/* Elementos Extra */
+.dot-online {
+  height: 10px;
+  width: 10px;
+  background-color: #22c55e;
+  border-radius: 50%;
+  margin-right: 8px;
+  box-shadow: 0 0 8px #22c55e;
+}
+
+.info-coche {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.15);
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+}
+
+.btn-toggle {
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1rem;
+  opacity: 0.8;
+}
