@@ -32,7 +32,7 @@ const Login = () => {
     <div className="flex min-h-screen items-center justify-center bg-gray-100 p-4">
       <form onSubmit={handleSubmit} className="p-8 bg-white rounded-2xl shadow-xl w-full max-w-sm border border-gray-100">
         <h2 className="mb-8 text-3xl font-bold text-gray-800 text-center">
-          {isRegistering ? 'Crea tu cuenta' : 'OpenHood Login'}
+          {isRegistering ? 'Crea tu cuenta' : 'Openhood'}
         </h2>
         
         {error && <p className="mb-4 text-red-600 bg-red-50 p-2 rounded text-center text-sm">{error}</p>}

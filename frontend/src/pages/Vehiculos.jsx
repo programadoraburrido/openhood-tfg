@@ -38,7 +38,7 @@ const Vehiculos = () => {
   if (loading) return <div className="p-10 text-center text-gray-500">Cargando mis vehículos...</div>;
 
   return (
-    <div className="min-h-screen bg-gray-100 p-8">
+    <div className="bg-gray-100 p-8">
       <div className="max-w-5xl mx-auto">
         
         {/* CABECERA ESTILO ROBER */}
