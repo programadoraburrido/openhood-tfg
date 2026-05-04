@@ -8,6 +8,10 @@
   80%       { transform: rotate(5deg); }
 }
 
+.font-montserrat {
+  font-family: 'Montserrat', sans-serif !important;
+}
+
 @utility animate-shake {
   animation: shake 0.35s ease;
-}@import "tailwindcss";
+}
