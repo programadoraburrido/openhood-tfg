@@ -1,13 +1,17 @@
-const express = require('express');
-const cors = require('cors');
-require('dotenv').config();
+import express from 'express';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import chatRoutes from './routes/chat.routes.js'; // Asegúrate de poner el .js al final
+
+dotenv.config();
 
 // Importamos las rutas
-const reparacionesRoutes = require('./routes/reparaciones.routes');
-const presupuestosRoutes = require('./routes/presupuestos.routes');
-const comparadorIARoutes = require('./routes/comparadorIA.routes');
-const authRoutes = require('./routes/auth.routes'); 
-const vehiculoRoutes = require('./routes/vehiculo.routes');
+
+import reparacionesRoutes from './routes/reparaciones.routes.js';
+import presupuestosRoutes from './routes/presupuestos.routes.js';
+import comparadorIARoutes from './routes/comparadorIA.routes.js';
+import authRoutes from './routes/auth.routes.js';
+import vehiculoRoutes from './routes/vehiculo.routes.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -33,6 +37,8 @@ app.use('/api/auth', authRoutes);
 
 // Se hace visible la carpeta (Esto te vendrá de lujo luego para las fotos de los vehículos con Multer)
 app.use('/api/vehiculos', vehiculoRoutes);
+
+app.use('/api/chat', chatRoutes); // Nueva ruta para el chat
 
 // Levantar el servidor
 app.listen(PORT, () => {

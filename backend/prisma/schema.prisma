@@ -18,6 +18,7 @@ model Usuario {
   telefono  String?
   password  String     
   vehiculos Vehiculo[]
+  mensajes  Mensaje[]
 }
 
 model Vehiculo {
@@ -32,6 +33,7 @@ model Vehiculo {
   
   piezas      Pieza[]      // Relación N:M
   reparaciones Reparacion[] // Relación 1:N
+  mensajes  Mensaje[]
 }
 
 model Taller {
@@ -87,4 +89,22 @@ model Presupuesto {
   // Relación 1 a 1 con Reparación
   reparacionId   Int        @unique
   reparacion     Reparacion @relation(fields: [reparacionId], references: [id], onDelete: Cascade)
+}
+// ==========================================
+// PARTE DE FACUNDO: ASISTENCIA (Chatbot)
+// ==========================================
+
+model Mensaje {
+  id         Int      @id @default(autoincrement())
+  contenido  String   @db.Text
+  rol        String   // "user" o "assistant"
+  fecha      DateTime @default(now())
+
+  // Relación con Usuario: para persistir el historial por cuenta
+  usuarioId  Int
+  usuario    Usuario  @relation(fields: [usuarioId], references: [id])
+
+  // Opcional: Relación con Vehículo por si la consulta es sobre un coche concreto
+  vehiculoMatricula String?
+  vehiculo          Vehiculo? @relation(fields: [vehiculoMatricula], references: [matricula])
 }
