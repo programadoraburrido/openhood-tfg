@@ -7,25 +7,22 @@ GET http://localhost:3000/
 
 ### 1. Obtener todas las reparaciones (GET)
 GET http://localhost:3000/api/reparaciones
-Authorization: Bearer {{token}}
 
 ### 2. Crear una nueva reparación (POST)
 POST http://localhost:3000/api/reparaciones
 Content-Type: application/json
-Authorization: Bearer {{token}}
 
 {
   "fecha": "2026-03-30T10:00:00Z",
-  "descripcion": "Cambio de bombilla de cruce",
-  "taller_nombre": "Talleres Pedro",
-  "kilometraje_momento": 228000,
-  "vehiculoMatricula": "7788KFC"
+  "descripcion": "Cambio de aceite",
+  "taller_nombre": "Talleres Paco",
+  "kilometraje_momento": 286000,
+  "vehiculoMatricula": "1234CCC"
 }
 
 ### 3. Actualizar una reparación (PUT)
 PUT http://localhost:3000/api/reparaciones/22
 Content-Type: application/json
-Authorization: Bearer {{token}}
 
 {
   "kilometraje_momento": 110000,
@@ -33,13 +30,10 @@ Authorization: Bearer {{token}}
 }
 
 ### 4. Eliminar una reparación (DELETE)
-DELETE http://localhost:3000/api/reparaciones/31
-Authorization: Bearer {{token}}
-
+DELETE http://localhost:3000/api/reparaciones/27
 
 ### 5. Buscar el historial de un coche por matrícula (GET)
-GET http://localhost:3000/api/reparaciones/vehiculo/7788KFC
-Authorization: Bearer {{token}}
+GET http://localhost:3000/api/reparaciones/vehiculo/1234CCC
 
 ####################
 ##  PRESUPUESTOS  ##
@@ -47,36 +41,29 @@ Authorization: Bearer {{token}}
 
 ### 1. Ver todos los presupuestos con su reparación (GET)
 GET http://localhost:3000/api/presupuestos
-Authorization: Bearer {{token}}
 
 ### 2. Crear un presupuesto automatizado (POST)
 POST http://localhost:3000/api/presupuestos
 Content-Type: application/json
-Authorization: Bearer {{token}}
 
 {
-  "base_imponible": 270.00,
-  "reparacionId": 6
+  "base_imponible": 400.00,
+  "reparacionId": 29
 }
 
 ### 3. Actualizar un presupuesto (PUT)
-PUT http://localhost:3000/api/presupuestos/1
+PUT http://localhost:3000/api/presupuestos/9
 Content-Type: application/json
-Authorization: Bearer {{token}}
 
 {
-  "base_imponible": 490.00
+  "base_imponible": 300.00
 }
 
 ### 4. Eliminar un presupuesto (DELETE)
 DELETE http://localhost:3000/api/presupuestos/12
-Authorization: Bearer {{token}}
 
 ### 5. Subir PDF a un presupuesto (Multipart Form)
-### Debemos crear un presupuesto asignado a una reparacion, cambiamos el id
-### y en la base de datos se comprueba que la url_pdf ha cambiado
 POST http://localhost:3000/api/presupuestos/16/pdf
-Authorization: Bearer {{token}}
 Content-Type: multipart/form-data; boundary=MiLimiteDeArchivo
 
 --MiLimiteDeArchivo
@@ -87,18 +74,8 @@ Content-Type: application/pdf
 --MiLimiteDeArchivo--
 
 ####################
-##  COMPARADOR IA  ##
-####################
-
-### 1. Analizar Presupuesto con Inteligencia Artificial (GET)
-GET http://localhost:3000/api/comparador/2/analizar
-Authorization: Bearer {{token}}
-
-####################
 ## IDENTIDAD (JOSE) ##
 ####################
-
-@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqb3NlQG9wZW5ob29kLmNvbSIsImlhdCI6MTc3NjQzNTk0MCwiZXhwIjoxNzc2NTIyMzQwfQ.xPYFTAHDNkFs5PBYiBqYdmxwQdkc33Q7yeF1Y2kpXPw
 
 ### 1. Registrar un nuevo usuario (POST)
 POST http://localhost:3000/api/auth/register
@@ -111,7 +88,8 @@ Content-Type: application/json
   "password": "miPasswordSegura123"
 }
 
-### Login de usuario
+### Login de usuario (EJECUTA ESTE PRIMERO)
+# @name login 
 POST http://localhost:3000/api/auth/login
 Content-Type: application/json
 
@@ -120,15 +98,14 @@ Content-Type: application/json
   "password": "miPasswordSegura123"
 }
 
-
 ### Obtener mis vehículos
 GET http://localhost:3000/api/vehiculos
-Authorization: Bearer {{token}}
+Authorization: Bearer {{login.response.body.token}}
 
-### Crear un vehículo (USA ESTE TOKEN)
+### Crear un vehículo
 POST http://localhost:3000/api/vehiculos
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{login.response.body.token}}
 
 {
   "matricula": "7788KFC",
@@ -140,20 +117,20 @@ Authorization: Bearer {{token}}
 
 ### Listar todos mis coches
 GET http://localhost:3000/api/vehiculos
-Authorization: Bearer {{token}}
+Authorization: Bearer {{login.response.body.token}}
 
 ### Ver un coche específico 
-GET http://localhost:3000/api/vehiculos/7788KFC
-Authorization: Bearer {{token}}
+GET http://localhost:3000/api/vehiculos/7784KFC
+Authorization: Bearer {{login.response.body.token}}
 
 ### Borrar un coche
 DELETE http://localhost:3000/api/vehiculos/7788KFC
-Authorization: Bearer {{token}}
+Authorization: Bearer {{login.response.body.token}}
 
 ### Probar el UPDATE (Actualizar kilometraje y modelo)
 PUT http://localhost:3000/api/vehiculos/7788KFC
 Content-Type: application/json
-Authorization: Bearer {{token}}
+Authorization: Bearer {{login.response.body.token}}
 
 {
   "kilometraje": 95000,
