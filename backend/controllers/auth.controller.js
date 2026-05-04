@@ -6,7 +6,15 @@ const prisma = new PrismaClient();
 
 const registrarUsuario = async (req, res) => {
   try {
+    // 1. Primero sacamos los datos del cuerpo
     const { nombre, email, telefono, password } = req.body;
+
+    // 2. Luego validamos que lo que hemos sacado no esté vacío
+    if (!nombre || !email || !password) {
+      return res.status(400).json({ mensaje: 'Todos los campos son obligatorios' });
+    }
+
+    // 3. Ahora seguimos con la lógica de base de datos
     const usuarioExistente = await prisma.usuario.findUnique({ where: { email } });
 
     if (usuarioExistente) {
@@ -51,5 +59,28 @@ const loginUsuario = async (req, res) => {
     res.status(500).json({ mensaje: 'Error en el login' });
   }
 };
+const obtenerPerfil = async (req, res) => {
+  try {
+    // req.user.id viene de tu middleware de autenticación (verificarToken)
+    // Asegúrate de que el middleware esté protegiendo esta ruta
+    const usuario = await prisma.usuario.findUnique({
+      where: { id: req.user.id },
+      select: { id: true, nombre: true, email: true, telefono: true } // Nunca devolvemos el password
+    });
 
-module.exports = { registrarUsuario, loginUsuario };
+    if (!usuario) {
+      return res.status(404).json({ mensaje: 'Usuario no encontrado' });
+    }
+    
+    res.json(usuario);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: 'Error al obtener perfil' });
+  }
+};
+
+module.exports = { 
+  registrarUsuario, 
+  loginUsuario, 
+  obtenerPerfil 
+};

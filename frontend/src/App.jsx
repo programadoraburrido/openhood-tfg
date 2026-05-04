@@ -1,5 +1,7 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Layout from './layouts/MainLayout';
+import Login from './pages/Login';
+import Vehiculos from './pages/Vehiculos'; 
 import HistorialVehiculo from './pages/HistorialVehiculo'; 
 import PoliticaPrivacidad from './pages/PoliticaPrivacidad';
 import TerminosUso from './pages/TerminosUso';
@@ -10,17 +12,17 @@ function App() {
     <BrowserRouter>
       <Routes>  
         <Route element={<Layout />}>
+          <Route path="/vehiculos" element={<Vehiculos />} />
+          <Route path="/" element={<Navigate to="/login" />} />
           <Route path="/historial/:matricula" element={<HistorialVehiculo />} />
           <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
           <Route path="/terminos-uso" element={<TerminosUso />} />
           <Route path="/aviso-legal" element={<AvisoLegal />} />
         </Route>
-
         {/* RUTA FUERA DEL LAYOUT: 
             Si algún día haces pantalla de Login y NO quieres que tenga 
             el Navbar y el Footer, simplemente la pones aquí abajo, fuera del padre. */}
-        {/* <Route path="/login" element={<Login />} /> */}
-
+        <Route path="/login" element={<Login />} />
       </Routes>
     </BrowserRouter>
   );
