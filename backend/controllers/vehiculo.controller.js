@@ -105,11 +105,87 @@ const actualizarVehiculo = async (req, res) => {
     res.status(500).json({ mensaje: 'Error al actualizar el vehículo', error: error.message });
   }
 };
+// SUBIR IMAGEN
+const subirImagenVehiculo = async (req, res) => {
+  try {
+    const { matricula } = req.params;
+    const file = req.file; // Multer inyecta el archivo aquí
 
+    if (!file) {
+      return res.status(400).json({ mensaje: 'No se ha subido ninguna imagen' });
+    }
+
+    // 1. Seguridad: Verificar que el coche existe y es del usuario
+    const vehiculo = await prisma.vehiculo.findFirst({
+      where: { 
+        matricula: matricula,
+        usuarioId: req.user.id 
+      }
+    });
+
+    if (!vehiculo) {
+      return res.status(404).json({ mensaje: 'Vehículo no encontrado o no autorizado' });
+    }
+
+    // 2. Definir la ruta relativa
+   // En tu vehiculo.controller.js
+    const imagenUrl = `/uploads/vehiculos/${file.filename}`;
+
+    // 3. Actualizar la base de datos usando tu campo 'fotoUrl'
+    await prisma.vehiculo.update({
+      where: { matricula: matricula },
+      data: { fotoUrl: imagenUrl }
+    });
+
+    res.json({ 
+      mensaje: 'Imagen subida correctamente', 
+      url: imagenUrl 
+    });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al subir la imagen', error: error.message });
+  }
+};
+// PONER EN VENTA / ACTUALIZAR PRECIO
+const publicarEnMarketplace = async (req, res) => {
+  try {
+    const { matricula } = req.params;
+    const { precio, enVenta } = req.body;
+
+    const vehiculo = await prisma.vehiculo.update({
+      where: { matricula: matricula },
+      data: { 
+        precio: precio ? parseFloat(precio) : null, 
+        enVenta: enVenta 
+      }
+    });
+
+    res.json({ mensaje: 'Estado de venta actualizado', vehiculo });
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al actualizar marketplace', error: error.message });
+  }
+};
+
+// LISTAR TODOS LOS VEHÍCULOS EN VENTA (Marketplace Privado)
+const obtenerMarketplace = async (req, res) => {
+  try {
+    const vehiculosEnVenta = await prisma.vehiculo.findMany({
+      where: { enVenta: true },
+      include: { 
+        usuario: { select: { nombre: true, telefono: true } } // Datos para contacto
+      }
+    });
+    res.json(vehiculosEnVenta);
+  } catch (error) {
+    res.status(500).json({ mensaje: 'Error al cargar el marketplace' });
+  }
+};
 module.exports = { 
   crearVehiculo, 
   obtenerMisVehiculos, 
   obtenerVehiculoPorMatricula, 
   eliminarVehiculo,
-  actualizarVehiculo 
+  actualizarVehiculo,
+  subirImagenVehiculo,
+  obtenerMarketplace,
+  publicarEnMarketplace
 };
