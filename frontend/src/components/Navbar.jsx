@@ -36,9 +36,20 @@ const Navbar = () => {
             
             {/* Solo mostramos el enlace de vehículos si está logueado */}
             {isLoggedIn && (
-              <Link to="/vehiculos" className="text-blue-600 hover:text-blue-700 font-medium transition">
-                Mis Vehículos
-              </Link>
+              <>
+                <Link to="/vehiculos" className="text-blue-600 hover:text-blue-700 font-medium transition">
+                  Mis Vehículos
+                </Link>
+                <Link to="/marketplace" className="text-blue-600 hover:text-blue-700 font-medium transition">
+                  Marketplace
+                </Link>
+                <Link to="/foro" className="text-blue-600 hover:text-blue-700 font-medium transition">
+                  Foro
+                </Link>
+                <Link to="/perfil" className="text-blue-600 hover:text-blue-700 font-medium transition">
+                  Mi Perfil
+                </Link>
+              </>
             )}
 
             {/* Renderizado condicional del botón de sesión */}

@@ -6,6 +6,11 @@ import HistorialVehiculo from './pages/HistorialVehiculo';
 import PoliticaPrivacidad from './pages/PoliticaPrivacidad';
 import TerminosUso from './pages/TerminosUso';
 import AvisoLegal from './pages/AvisoLegal';
+import Marketplace from './pages/Marketplace';
+import HistorialPublico from './components/HistorialPublico'
+import Perfil from './pages/Perfil';
+import Foro from './pages/Foro';
+import TemaDetalle from './pages/TemaDetalle';
 
 function App() {
   return (
@@ -18,6 +23,11 @@ function App() {
           <Route path="/politica-privacidad" element={<PoliticaPrivacidad />} />
           <Route path="/terminos-uso" element={<TerminosUso />} />
           <Route path="/aviso-legal" element={<AvisoLegal />} />
+          <Route path="/marketplace" element={<Marketplace />} />
+          <Route path="/vehiculos/historial/:matricula" element={<HistorialPublico />} />
+          <Route path="/perfil" element={<Perfil />} />
+          <Route path="/foro" element={<Foro />} />
+          <Route path="/foro/:id" element={<TemaDetalle />} />
         </Route>
         {/* RUTA FUERA DEL LAYOUT: 
             Si algún día haces pantalla de Login y NO quieres que tenga 

@@ -18,6 +18,8 @@ model Usuario {
   telefono  String?
   password  String     
   vehiculos Vehiculo[]
+  foroTemas      ForoTema[]
+  foroRespuestas ForoRespuesta[]
 }
 
 model Vehiculo {
@@ -87,4 +89,33 @@ model Presupuesto {
   // Relación 1 a 1 con Reparación
   reparacionId   Int        @unique
   reparacion     Reparacion @relation(fields: [reparacionId], references: [id], onDelete: Cascade)
+}
+
+model ForoTema {
+  id             Int             @id @default(autoincrement())
+  titulo         String
+  contenido      String          @db.Text
+  categoria      String
+  fecha_creacion DateTime        @default(now())
+
+  // Relación con el Usuario que crea el tema (N a 1)
+  usuarioId      Int
+  usuario        Usuario         @relation(fields: [usuarioId], references: [id])
+
+  // Relación con las respuestas (1 a N)
+  respuestas     ForoRespuesta[]
+}
+
+model ForoRespuesta {
+  id             Int             @id @default(autoincrement())
+  contenido      String          @db.Text
+  fecha_creacion DateTime        @default(now())
+
+  // Relación con el Tema al que pertenece (N a 1)
+  temaId         Int
+  tema           ForoTema        @relation(fields: [temaId], references: [id], onDelete: Cascade)
+
+  // Relación con el Usuario que responde (N a 1)
+  usuarioId      Int
+  usuario        Usuario         @relation(fields: [usuarioId], references: [id])
 }
