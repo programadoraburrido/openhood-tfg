@@ -3,22 +3,24 @@ import api from '../api/axios';
 
 const FormularioVehiculo = ({ isOpen, onClose, vehiculoAEditar, onSuccess }) => {
   const [formData, setFormData] = useState({
-    matricula: '', marca: '', modelo: '', año: '', kilometraje: ''
+    matricula: '', marca: '', modelo: '', año: '', kilometraje: '',
+    precio: '', enVenta: false // <--- NUEVOS CAMPOS
   });
+  const [file, setFile] = useState(null);
 
-  // Si abrimos el formulario para editar, precargamos los datos
   useEffect(() => {
     if (vehiculoAEditar) {
       setFormData({
         matricula: vehiculoAEditar.matricula,
         marca: vehiculoAEditar.marca,
         modelo: vehiculoAEditar.modelo,
-        año: vehiculoAEditar.anio, // Prisma usa 'anio'
-        kilometraje: vehiculoAEditar.kilometraje
+        año: vehiculoAEditar.anio,
+        kilometraje: vehiculoAEditar.kilometraje,
+        precio: vehiculoAEditar.precio || '', // Cargamos el precio
+        enVenta: vehiculoAEditar.enVenta || false // Cargamos el estado
       });
     } else {
-      // Limpiamos si es nuevo
-      setFormData({ matricula: '', marca: '', modelo: '', año: '', kilometraje: '' });
+      setFormData({ matricula: '', marca: '', modelo: '', año: '', kilometraje: '', precio: '', enVenta: false });
     }
   }, [vehiculoAEditar, isOpen]);
 
@@ -26,14 +28,29 @@ const FormularioVehiculo = ({ isOpen, onClose, vehiculoAEditar, onSuccess }) => 
     e.preventDefault();
     try {
       if (vehiculoAEditar) {
-        // Lógica de actualización (PUT)
+        // 1. Actualizar datos base
         await api.put(`/vehiculos/${vehiculoAEditar.matricula}`, formData);
+        
+        // 2. Actualizar estado de venta (Marketplace)
+        await api.put(`/vehiculos/marketplace/${vehiculoAEditar.matricula}`, {
+            precio: formData.precio,
+            enVenta: formData.enVenta
+        });
+        
+        // 3. Subir foto si hay una nueva
+        if (file) {
+          const formDataImg = new FormData();
+          formDataImg.append('imagen', file);
+          await api.post(`/vehiculos/upload-image/${vehiculoAEditar.matricula}`, formDataImg, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+          });
+        }
       } else {
-        // Lógica de creación (POST)
         await api.post('/vehiculos', formData);
       }
-      onSuccess(); // Recarga la lista en el padre
-      onClose();   // Cierra el modal
+      
+      onSuccess();
+      onClose();
     } catch (error) {
       alert("Error al guardar: " + (error.response?.data?.mensaje || error.message));
     }
@@ -50,7 +67,7 @@ const FormularioVehiculo = ({ isOpen, onClose, vehiculoAEditar, onSuccess }) => 
         
         <input className="w-full p-2 border rounded mb-2" placeholder="Matrícula" 
                value={formData.matricula} onChange={e => setFormData({...formData, matricula: e.target.value})} 
-               required disabled={!!vehiculoAEditar} /> {/* Matrícula bloqueada al editar */}
+               required disabled={!!vehiculoAEditar} />
         
         <input className="w-full p-2 border rounded mb-2" placeholder="Marca" 
                value={formData.marca} onChange={e => setFormData({...formData, marca: e.target.value})} required />
@@ -61,8 +78,27 @@ const FormularioVehiculo = ({ isOpen, onClose, vehiculoAEditar, onSuccess }) => 
         <input className="w-full p-2 border rounded mb-2" type="number" placeholder="Año" 
                value={formData.año} onChange={e => setFormData({...formData, año: e.target.value})} required />
         
-        <input className="w-full p-2 border rounded mb-4" type="number" placeholder="Kilometraje" 
+        <input className="w-full p-2 border rounded mb-2" type="number" placeholder="Kilometraje" 
                value={formData.kilometraje} onChange={e => setFormData({...formData, kilometraje: e.target.value})} required />
+
+        {/* CAMPOS MARKETPLACE */}
+        {vehiculoAEditar && (
+            <>
+                <input className="w-full p-2 border rounded mb-2" type="number" placeholder="Precio de venta (€)" 
+                       value={formData.precio} onChange={e => setFormData({...formData, precio: e.target.value})} />
+                
+                <label className="flex items-center gap-2 mb-4 text-sm text-gray-700 cursor-pointer">
+                    <input type="checkbox" checked={formData.enVenta} 
+                           onChange={e => setFormData({...formData, enVenta: e.target.checked})} />
+                    Publicar en el Marketplace
+                </label>
+
+                <div className="mb-4 border-t pt-2">
+                    <label className="text-xs text-gray-500">Cambiar foto:</label>
+                    <input type="file" onChange={e => setFile(e.target.files[0])} className="w-full mt-1 text-sm" />
+                </div>
+            </>
+        )}
         
         <div className="flex gap-2">
           <button type="submit" className="flex-1 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 font-medium">Guardar</button>
