@@ -34,12 +34,20 @@ const Navbar = () => {
           {/* Menú derecho: Enlaces y Botón de Auth */}
           <div className="flex items-center gap-6">
             
-            {/* Solo mostramos el enlace de vehículos si está logueado */}
+            {/* Solo mostramos los enlaces si está logueado */}
             {isLoggedIn && (
+            <>
               <Link to="/vehiculos" className="text-blue-600 hover:text-blue-700 font-medium transition">
                 Mis Vehículos
               </Link>
-            )}
+              <Link to="/marketplace" className="text-blue-600 hover:text-blue-700 font-medium transition">
+                Marketplace
+              </Link>
+              <Link to="/perfil" className="text-blue-600 hover:text-blue-700 font-medium transition">
+                 Mi Perfil
+               </Link>
+            </>
+              )}
 
             {/* Renderizado condicional del botón de sesión */}
             {isLoggedIn ? (

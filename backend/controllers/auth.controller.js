@@ -78,9 +78,37 @@ const obtenerPerfil = async (req, res) => {
     res.status(500).json({ mensaje: 'Error al obtener perfil' });
   }
 };
+const actualizarPerfil = async (req, res) => {
+  try {
+    const { nombre, telefono } = req.body;
+
+    // Validación básica: no permitimos campos vacíos que rompan la base de datos
+    if (!nombre) {
+      return res.status(400).json({ mensaje: 'El nombre es obligatorio' });
+    }
+
+    const usuarioActualizado = await prisma.usuario.update({
+      where: { id: req.user.id }, // Usamos el ID del token
+      data: { 
+        nombre, 
+        telefono 
+      },
+      select: { id: true, nombre: true, email: true, telefono: true }
+    });
+
+    res.json({ 
+      mensaje: 'Perfil actualizado con éxito', 
+      usuario: usuarioActualizado 
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ mensaje: 'Error al actualizar el perfil' });
+  }
+};
 
 module.exports = { 
   registrarUsuario, 
   loginUsuario, 
-  obtenerPerfil 
+  obtenerPerfil,
+  actualizarPerfil
 };
