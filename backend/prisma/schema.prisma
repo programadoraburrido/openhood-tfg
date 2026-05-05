@@ -23,17 +23,23 @@ model Usuario {
 }
 
 model Vehiculo {
-  matricula   String       @id
+  matricula   String    @id
   marca       String
   modelo      String
   anio        Int
   kilometraje Int
-  fotoUrl     String?      
-  usuarioId   Int
-  usuario     Usuario      @relation(fields: [usuarioId], references: [id])
+  fotoUrl     String?
   
-  piezas      Pieza[]      // Relación N:M
-  reparaciones Reparacion[] // Relación 1:N
+  // --- CAMPOS NUEVOS PARA MARKETPLACE ---
+  precio      Float?    // Precio de venta (opcional)
+  enVenta     Boolean   @default(false) // ¿Está en el marketplace?
+  // --------------------------------------
+  
+  usuarioId   Int
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+  
+  piezas      Pieza[]
+  reparaciones Reparacion[]
 }
 
 model Taller {

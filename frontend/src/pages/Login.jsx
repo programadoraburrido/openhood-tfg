@@ -6,7 +6,11 @@ const Login = () => {
   const [isRegistering, setIsRegistering] = useState(false);
   const [formData, setFormData] = useState({ email: '', password: '', nombre: '', telefono: '' });
   const [error, setError] = useState('');
-  const { login, register } = useContext(AuthContext); // Asegúrate de que register exista en tu Context
+  
+  // Estado para el Modal
+  const [modal, setModal] = useState({ isOpen: false, titulo: '', mensaje: '', esExito: false });
+
+  const { login, register } = useContext(AuthContext);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -15,14 +19,14 @@ const Login = () => {
     try {
       if (isRegistering) {
         await register(formData.nombre, formData.email, formData.telefono, formData.password);
-        alert("Usuario registrado. Ya puedes iniciar sesión.");
-        setIsRegistering(false);
+        setModal({ isOpen: true, titulo: '¡Registro exitoso!', mensaje: 'Ya puedes iniciar sesión con tu cuenta.', esExito: true });
       } else {
         await login(formData.email, formData.password);
         navigate('/vehiculos');
       }
     } catch (err) {
-      setError(isRegistering ? 'Error al registrar' : 'Credenciales incorrectas');
+      // Si hay error, mostramos el modal de error
+      setModal({ isOpen: true, titulo: 'Error', mensaje: isRegistering ? 'No se pudo crear la cuenta.' : 'Credenciales incorrectas.', esExito: false });
     }
   };
 
@@ -34,8 +38,6 @@ const Login = () => {
         <h2 className="mb-8 text-3xl font-bold text-gray-800 text-center">
           {isRegistering ? 'Crea tu cuenta' : 'Openhood'}
         </h2>
-        
-        {error && <p className="mb-4 text-red-600 bg-red-50 p-2 rounded text-center text-sm">{error}</p>}
         
         <div className="space-y-4">
           {isRegistering && (
@@ -63,6 +65,25 @@ const Login = () => {
           </button>
         </p>
       </form>
+
+      {/* MODAL (Estilo idéntico al de Vehiculos.jsx) */}
+      {modal.isOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center">
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">{modal.titulo}</h3>
+            <p className="text-gray-600 mb-6">{modal.mensaje}</p>
+            <button 
+              onClick={() => {
+                setModal({ isOpen: false, titulo: '', mensaje: '', esExito: false });
+                if (modal.esExito) setIsRegistering(false); // Si fue éxito, volvemos al login
+              }} 
+              className="px-4 py-2 bg-blue-600 text-white rounded-xl w-full hover:bg-blue-700 transition"
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
