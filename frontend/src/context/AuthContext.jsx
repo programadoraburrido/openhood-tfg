@@ -13,7 +13,6 @@ export const AuthProvider = ({ children }) => {
     return res.data;
   };
 
-  // Nueva función de registro
   const register = async (nombre, email, telefono, password) => {
     const res = await api.post('/auth/register', { nombre, email, telefono, password });
     return res.data;
@@ -24,9 +23,9 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
   };
 
-  // ¡IMPORTANTE!: Añadimos 'register' al value para que el Login pueda usarlo
+  // Aquí añadimos 'setUser' al value para poder actualizar el usuario desde Perfil.jsx
   return (
-    <AuthContext.Provider value={{ user, login, register, logout }}>
+    <AuthContext.Provider value={{ user, login, register, logout, setUser }}>
       {children}
     </AuthContext.Provider>
   );
