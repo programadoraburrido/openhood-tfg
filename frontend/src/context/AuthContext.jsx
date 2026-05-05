@@ -9,6 +9,12 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     const res = await api.post('/auth/login', { email, password });
     localStorage.setItem('token', res.data.token);
+    localStorage.setItem('usuarioId', res.data.usuario.id); // Guardamos el ID del usuario para el chat
+   if (res.data.usuario.matriculaActiva) {
+        localStorage.setItem('matriculaActiva', res.data.usuario.matriculaActiva);
+    } else {
+        localStorage.removeItem('matriculaActiva'); 
+    }
     setUser(res.data.usuario);
     return res.data;
   };
@@ -20,6 +26,8 @@ export const AuthProvider = ({ children }) => {
 
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('usuarioId');
+    localStorage.removeItem('matriculaActiva');
     setUser(null);
   };
 

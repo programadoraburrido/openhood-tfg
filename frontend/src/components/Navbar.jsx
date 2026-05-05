@@ -10,7 +10,9 @@ const Navbar = () => {
 
   const handleLogout = () => {
     // Borramos el token y redirigimos al login
-    localStorage.removeItem('token');
+  localStorage.removeItem('usuarioId');
+  localStorage.removeItem('token');
+  localStorage.removeItem('matriculaActiva');
     setIsLoggedIn(false);
     navigate('/login'); 
   };

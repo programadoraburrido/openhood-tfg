@@ -1,8 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const { handleChat, getChatHistory } = require('../controllers/chat.controller');
+// Importamos el controlador completo
+const chatController = require('../controllers/chat.controller');
 
-router.post('/', handleChat);
-router.get('/history/:usuarioId', getChatHistory);
+// Ahora chatController es un objeto que contiene todas las funciones
+router.post('/', chatController.handleChat);
+router.get('/history/:usuarioId', chatController.getChatHistory);
+router.get('/vehicles/:usuarioId', chatController.getUserVehicles);
 
-module.exports = router; // Forma antigua
+module.exports = router;
