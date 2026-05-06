@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import FormularioVehiculo from '../components/FormularioVehiculo';
+import ModalPublicar from '../components/ModalPublicar';
+import ModalDespublicar from '../components/ModalDespublicar';
 
 const Vehiculos = () => {
   const [vehiculos, setVehiculos] = useState([]);
@@ -9,6 +11,8 @@ const Vehiculos = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [vehiculoAEditar, setVehiculoAEditar] = useState(null);
   const [matriculaABorrar, setMatriculaABorrar] = useState(null);
+  const [publicarModalOpen, setPublicarModalOpen] = useState(false);
+  const [despublicarModalOpen, setDespublicarModalOpen] = useState(false);
 
   const fetchVehiculos = async () => {
     try {
@@ -52,6 +56,14 @@ const Vehiculos = () => {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
             Nuevo Vehículo
           </button>
+         <button onClick={() => setPublicarModalOpen(true)} 
+            className="bg-green-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-green-700 transition shadow-sm mr-2">
+            Publicar Anuncio
+          </button>
+         <button onClick={() => setDespublicarModalOpen(true)} 
+              className="bg-red-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-red-700 transition shadow-sm mr-2">
+              Retirar Anuncio
+        </button>
         </div>
 
         {/* LISTA DE VEHÍCULOS */}
@@ -116,6 +128,18 @@ const Vehiculos = () => {
           vehiculoAEditar={vehiculoAEditar} 
           onSuccess={fetchVehiculos} 
         />
+        <ModalPublicar 
+          isOpen={publicarModalOpen} 
+          onClose={() => setPublicarModalOpen(false)}
+          vehiculos={vehiculos}
+          onSuccess={fetchVehiculos} 
+          />
+        <ModalDespublicar 
+          isOpen={despublicarModalOpen} 
+          onClose={() => setDespublicarModalOpen(false)}
+          vehiculos={vehiculos}
+          onSuccess={fetchVehiculos} 
+          />
 
         {/* Modal Borrado */}
         {matriculaABorrar && (

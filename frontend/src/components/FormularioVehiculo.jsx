@@ -3,8 +3,7 @@ import api from '../api/axios';
 
 const FormularioVehiculo = ({ isOpen, onClose, vehiculoAEditar, onSuccess }) => {
   const [formData, setFormData] = useState({
-    matricula: '', marca: '', modelo: '', año: '', kilometraje: '',
-    precio: '', enVenta: false // <--- NUEVOS CAMPOS
+    matricula: '', marca: '', modelo: '', año: '', kilometraje: ''
   });
   const [file, setFile] = useState(null);
 
@@ -15,12 +14,11 @@ const FormularioVehiculo = ({ isOpen, onClose, vehiculoAEditar, onSuccess }) => 
         marca: vehiculoAEditar.marca,
         modelo: vehiculoAEditar.modelo,
         año: vehiculoAEditar.anio,
-        kilometraje: vehiculoAEditar.kilometraje,
-        precio: vehiculoAEditar.precio || '', // Cargamos el precio
-        enVenta: vehiculoAEditar.enVenta || false // Cargamos el estado
+        kilometraje: vehiculoAEditar.kilometraje
       });
     } else {
-      setFormData({ matricula: '', marca: '', modelo: '', año: '', kilometraje: '', precio: '', enVenta: false });
+      setFormData({ matricula: '', marca: '', modelo: '', año: '', kilometraje: '' });
+      setFile(null);
     }
   }, [vehiculoAEditar, isOpen]);
 
@@ -28,16 +26,10 @@ const FormularioVehiculo = ({ isOpen, onClose, vehiculoAEditar, onSuccess }) => 
     e.preventDefault();
     try {
       if (vehiculoAEditar) {
-        // 1. Actualizar datos base
+        // Solo actualizamos los datos básicos
         await api.put(`/vehiculos/${vehiculoAEditar.matricula}`, formData);
         
-        // 2. Actualizar estado de venta (Marketplace)
-        await api.put(`/vehiculos/marketplace/${vehiculoAEditar.matricula}`, {
-            precio: formData.precio,
-            enVenta: formData.enVenta
-        });
-        
-        // 3. Subir foto si hay una nueva
+        // Subir foto si hay una nueva
         if (file) {
           const formDataImg = new FormData();
           formDataImg.append('imagen', file);
@@ -78,27 +70,25 @@ const FormularioVehiculo = ({ isOpen, onClose, vehiculoAEditar, onSuccess }) => 
         <input className="w-full p-2 border rounded mb-2" type="number" placeholder="Año" 
                value={formData.año} onChange={e => setFormData({...formData, año: e.target.value})} required />
         
-        <input className="w-full p-2 border rounded mb-2" type="number" placeholder="Kilometraje" 
+        <input className="w-full p-2 border rounded mb-4" type="number" placeholder="Kilometraje" 
                value={formData.kilometraje} onChange={e => setFormData({...formData, kilometraje: e.target.value})} required />
 
-        {/* CAMPOS MARKETPLACE */}
-        {vehiculoAEditar && (
-            <>
-                <input className="w-full p-2 border rounded mb-2" type="number" placeholder="Precio de venta (€)" 
-                       value={formData.precio} onChange={e => setFormData({...formData, precio: e.target.value})} />
-                
-                <label className="flex items-center gap-2 mb-4 text-sm text-gray-700 cursor-pointer">
-                    <input type="checkbox" checked={formData.enVenta} 
-                           onChange={e => setFormData({...formData, enVenta: e.target.checked})} />
-                    Publicar en el Marketplace
-                </label>
-
-                <div className="mb-4 border-t pt-2">
-                    <label className="text-xs text-gray-500">Cambiar foto:</label>
-                    <input type="file" onChange={e => setFile(e.target.files[0])} className="w-full mt-1 text-sm" />
-                </div>
-            </>
-        )}
+        {/* ESTE ES EL NUEVO DISEÑO */}
+        <div className="mb-4 border-t pt-4">
+            <label className="text-xs text-gray-500 mb-2 block">Foto del vehículo:</label>
+            <label 
+                htmlFor="file-upload" 
+                className="cursor-pointer bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-2 px-4 rounded-lg text-sm transition text-center block w-full border border-dashed border-gray-400"
+            >
+                {file ? file.name : "Seleccionar imagen"}
+            </label>
+            <input 
+                id="file-upload" 
+                type="file" 
+                onChange={e => setFile(e.target.files[0])} 
+                className="hidden" 
+            />
+        </div>
         
         <div className="flex gap-2">
           <button type="submit" className="flex-1 bg-blue-600 text-white p-2 rounded hover:bg-blue-700 font-medium">Guardar</button>
