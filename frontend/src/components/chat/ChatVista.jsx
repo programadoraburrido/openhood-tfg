@@ -4,7 +4,7 @@ import './ChatVista.css';
 
 const PREGUNTAS_RAPIDAS = [
   "¿Qué mantenimiento me toca?",
-  "¿Presión de neumáticos?",
+  "¿Taller cercano?",
   "¿Qué aceite usa mi motor?",
   "¿Significado de testigos?"
 ];
@@ -15,6 +15,7 @@ const ChatVista = () => {
   const [escribiendo, setEscribiendo] = useState(false);
   const [minimizado, setMinimizado] = useState(true);
   const [misVehiculos, setMisVehiculos] = useState([]);
+  const [ubicacion, setUbicacion] = useState({ lat: null, lng: null });
 
   const mensajesEndRef = useRef(null);
   const offset = useRef({ x: 0, y: 0 });
@@ -24,14 +25,22 @@ const ChatVista = () => {
   const usuarioId = localStorage.getItem('usuarioId');
   const [matriculaActiva, setMatriculaActiva] = useState(localStorage.getItem('matriculaActiva'));
 
-  // Auto-scroll
+  // 1. Obtener ubicación al cargar el componente
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (pos) => setUbicacion({ lat: pos.coords.latitude, lng: pos.coords.longitude }),
+        (err) => console.log("Chat sin ubicación:", err)
+      );
+    }
+  }, []);
+
   useEffect(() => {
     if (!minimizado) {
       setTimeout(() => { mensajesEndRef.current?.scrollIntoView({ behavior: "smooth" }); }, 100);
     }
   }, [mensajes, escribiendo, minimizado]);
 
-  // Cargar vehículos
   useEffect(() => {
     const fetchVehiculos = async () => {
       if (!usuarioId) return;
@@ -50,15 +59,17 @@ const ChatVista = () => {
     setMensajes(prev => [...prev, { rol: 'assistant', contenido: `🚗 Contexto: ${mat}.` }]);
   };
 
-  // Lógica de envío (factorizada para reuso)
   const procesarEnvio = async (texto) => {
     setMensajes(prev => [...prev, { contenido: texto, rol: 'user' }]);
     setEscribiendo(true);
     try {
+      // Enviamos también lat y lng
       const res = await axios.post('http://localhost:3000/api/chat', {
         contenido: texto,
         usuarioId: parseInt(usuarioId),
-        vehiculoMatricula: matriculaActiva
+        vehiculoMatricula: matriculaActiva,
+        lat: ubicacion.lat,
+        lng: ubicacion.lng
       });
       setMensajes(prev => [...prev, res.data]);
     } catch (err) { console.error(err); } finally { setEscribiendo(false); }
@@ -120,15 +131,9 @@ const ChatVista = () => {
             <div ref={mensajesEndRef} />
           </div>
 
-          {/* SUGERENCIAS RÁPIDAS */}
           <div className="contenedor-sugerencias">
             {PREGUNTAS_RAPIDAS.map((pregunta, index) => (
-              <button 
-                key={index} 
-                className="btn-sugerencia" 
-                onClick={() => enviarPreguntaRapida(pregunta)}
-                disabled={escribiendo}
-              >
+              <button key={index} className="btn-sugerencia" onClick={() => enviarPreguntaRapida(pregunta)} disabled={escribiendo}>
                 {pregunta}
               </button>
             ))}

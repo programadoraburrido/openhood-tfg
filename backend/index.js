@@ -10,6 +10,7 @@ const comparadorIARoutes = require('./routes/comparadorIA.routes');
 const authRoutes = require('./routes/auth.routes');
 const vehiculoRoutes = require('./routes/vehiculo.routes');
 const foroRoutes = require('./routes/foro.routes');
+const tallerRoutes = require('./routes/talleres.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -27,6 +28,7 @@ app.use('/api/comparador', comparadorIARoutes);
 app.use('/api/auth', authRoutes); 
 app.use('/api/vehiculos', vehiculoRoutes);
 app.use('/api/chat', chatRoutes); 
+app.use('/api/talleres', tallerRoutes);
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);

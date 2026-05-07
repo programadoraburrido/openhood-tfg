@@ -1,9 +1,9 @@
-import { Router } from 'express';
-import { getTalleres, createTaller } from '../controllers/talleres.controller.js';
+const express = require('express');
+const router = express.Router();
+const tallerController = require('../controllers/talleres.controller');
 
-const router = Router();
-
-router.get('/', getTalleres);
-router.post('/', createTaller);
+router.get('/', tallerController.getTalleres);
+router.get('/cercanos', tallerController.getTalleresCercanos);
+router.post('/', tallerController.createTaller);
 
 module.exports = router;
