@@ -9,6 +9,7 @@ const presupuestosRoutes = require('./routes/presupuestos.routes');
 const comparadorIARoutes = require('./routes/comparadorIA.routes');
 const authRoutes = require('./routes/auth.routes');
 const vehiculoRoutes = require('./routes/vehiculo.routes');
+const foroRoutes = require('./routes/foro.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
