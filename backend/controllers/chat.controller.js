@@ -39,7 +39,7 @@ exports.handleChat = async (req, res) => {
                 SELECT id, nombre, direccion, telefono,
                 (6371 * acos(cos(radians(${lat})) * cos(radians(latitud)) * cos(radians(longitud) - radians(${lng})) + sin(radians(${lat})) * sin(radians(latitud)))) AS distance
                 FROM Taller
-                HAVING distance < 20
+                HAVING distance < 50
                 ORDER BY distance ASC
                 LIMIT 3
             `;

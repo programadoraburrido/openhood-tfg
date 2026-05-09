@@ -28,6 +28,7 @@ app.use('/api/comparador', comparadorIARoutes);
 app.use('/api/auth', authRoutes); 
 app.use('/api/vehiculos', vehiculoRoutes);
 app.use('/api/chat', chatRoutes); 
+app.use('/api/foro', foroRoutes);
 app.use('/api/talleres', tallerRoutes);
 
 app.listen(PORT, () => {
