@@ -26,9 +26,9 @@ app.get('/', (req, res) => res.send('¡API de OpenHood funcionando en modo Commo
 app.use('/api/reparaciones', reparacionesRoutes);
 app.use('/api/presupuestos', presupuestosRoutes);
 app.use('/api/comparador', comparadorIARoutes);
-app.use('/api/auth', authRoutes); 
+app.use('/api/auth', authRoutes);
 app.use('/api/vehiculos', vehiculoRoutes);
-app.use('/api/chat', chatRoutes); 
+app.use('/api/chat', chatRoutes);
 app.use('/api/foro', foroRoutes);
 app.use('/api/talleres', tallerRoutes);
 app.use('/api/dashboard', dashboardRoutes);

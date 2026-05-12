@@ -39,10 +39,10 @@ model Vehiculo {
   precio  Float? // Precio de venta (opcional)
   enVenta Boolean @default(false) // ¿Está en el marketplace?
   // --------------------------------------
-
-  usuarioId Int
-  usuario   Usuario @relation(fields: [usuarioId], references: [id])
-}
+  
+  usuarioId   Int
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+  }
 
 model Taller {
   id          Int     @id @default(autoincrement())

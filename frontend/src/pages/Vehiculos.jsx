@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import FormularioVehiculo from '../components/FormularioVehiculo';
+import ModalPublicar from '../components/ModalPublicar';
+import ModalDespublicar from '../components/ModalDespublicar';
 
 const Vehiculos = () => {
   const [vehiculos, setVehiculos] = useState([]);
@@ -9,6 +11,10 @@ const Vehiculos = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [vehiculoAEditar, setVehiculoAEditar] = useState(null);
   const [matriculaABorrar, setMatriculaABorrar] = useState(null);
+  const [errorBorrado, setErrorBorrado] = useState('');
+  
+  const [publicarModalOpen, setPublicarModalOpen] = useState(false);
+  const [despublicarModalOpen, setDespublicarModalOpen] = useState(false);
 
   const fetchVehiculos = async () => {
     try {
@@ -25,17 +31,17 @@ const Vehiculos = () => {
 
   const confirmarBorradoVehiculo = async () => {
     if (!matriculaABorrar) return;
+    setErrorBorrado('');
     try {
       await api.delete(`/vehiculos/${matriculaABorrar}`);
       fetchVehiculos();
       setMatriculaABorrar(null);
-    } catch  {
-      alert("No se pudo eliminar el vehículo.");
-      setMatriculaABorrar(null);
+    } catch (err) {
+      // Sustituimos el alert() nativo por un estado
+      setErrorBorrado(err.response?.data?.mensaje || "No se pudo eliminar el vehículo.");
     }
   };
 
-  // Estado de carga coherente con el Dashboard
   if (loading) {
     return (
       <div className="min-h-[calc(100vh-80px)] bg-[#F8FAFC] flex justify-center items-center">
@@ -51,21 +57,43 @@ const Vehiculos = () => {
     <div className="min-h-[calc(100vh-80px)] bg-[#F8FAFC] p-4 sm:p-8 animate-fade-in">
       <div className="max-w-5xl mx-auto">
         
-        {/* CABECERA */}
-        <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-[#00B4D8] mb-8 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        {/* CABECERA Y GRUPO DE BOTONES */}
+        <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-gray-100 border-l-4 border-l-[#00B4D8] mb-8 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-6">
           <div>
             <h1 className="text-3xl font-bold text-[#1A365D]">Mis Vehículos</h1>
             <p className="text-gray-500 mt-1 text-sm sm:text-base">Gestiona tu flota, mantenimientos e historial</p>
           </div>
-          <button 
-            onClick={() => { setVehiculoAEditar(null); setModalOpen(true); }} 
-            className="w-full sm:w-auto bg-[#00B4D8] text-white px-5 py-3 rounded-xl font-bold hover:bg-cyan-500 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 flex items-center justify-center gap-2"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"></path>
-            </svg>
-            Nuevo Vehículo
-          </button>
+          
+          {/* Contenedor flexible para alinear los 3 botones */}
+          <div className="flex flex-col sm:flex-row gap-3 w-full lg:w-auto">
+            
+            {/* Botón Publicar (Secundario) */}
+            <button 
+              onClick={() => setPublicarModalOpen(true)} 
+              className="w-full sm:w-auto bg-[#e6f7fa] text-[#00B4D8] border border-[#00B4D8]/20 px-4 py-2.5 rounded-xl font-bold hover:bg-[#00B4D8] hover:text-white transition-all shadow-sm flex items-center justify-center gap-2"
+            >
+              <span>🏷️</span> Publicar Anuncio
+            </button>
+            
+            {/* Botón Retirar (Destructivo suave) */}
+            <button 
+              onClick={() => setDespublicarModalOpen(true)} 
+              className="w-full sm:w-auto bg-red-50 text-red-600 border border-red-100 px-4 py-2.5 rounded-xl font-bold hover:bg-red-500 hover:text-white transition-all shadow-sm flex items-center justify-center gap-2"
+            >
+              <span>🛑</span> Retirar Anuncio
+            </button>
+
+            {/* Botón Nuevo (Primario - Llamada a la acción) */}
+            <button 
+              onClick={() => { setVehiculoAEditar(null); setModalOpen(true); }} 
+              className="w-full sm:w-auto bg-[#00B4D8] text-white px-5 py-2.5 rounded-xl font-bold hover:bg-cyan-500 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5 flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4"></path>
+              </svg>
+              Nuevo Vehículo
+            </button>
+          </div>
         </div>
 
         {/* LISTA DE VEHÍCULOS */}
@@ -75,7 +103,12 @@ const Vehiculos = () => {
               
               <Link to={`/historial/${v.matricula}`} className="flex-1 flex flex-col sm:flex-row items-center sm:items-start gap-4 w-full text-center sm:text-left">
                 {/* FOTO */}
-                <div className="w-24 h-24 sm:w-20 sm:h-20 bg-gray-50 rounded-xl overflow-hidden shrink-0 border border-gray-100 group-hover:border-[#00B4D8]/30 transition-colors">
+                <div className="w-24 h-24 sm:w-20 sm:h-20 bg-gray-50 rounded-xl overflow-hidden shrink-0 border border-gray-100 group-hover:border-[#00B4D8]/30 transition-colors relative">
+                  {v.enVenta && (
+                     <span className="absolute top-0 right-0 bg-[#00B4D8] text-white text-[10px] font-bold px-1.5 py-0.5 rounded-bl-lg z-10 shadow-sm">
+                       En Venta
+                     </span>
+                  )}
                   {v.fotoUrl ? (
                     <img 
                       src={`http://localhost:3000${v.fotoUrl}`} 
@@ -143,19 +176,31 @@ const Vehiculos = () => {
           )}
         </div>
 
-        {/* MODAL DE FORMULARIO */}
+        {/* MODALES EXTERNOS */}
         <FormularioVehiculo 
           isOpen={modalOpen} 
           onClose={() => setModalOpen(false)} 
           vehiculoAEditar={vehiculoAEditar} 
           onSuccess={fetchVehiculos} 
         />
+        <ModalPublicar 
+          isOpen={publicarModalOpen} 
+          onClose={() => setPublicarModalOpen(false)}
+          vehiculos={vehiculos}
+          onSuccess={fetchVehiculos} 
+        />
+        <ModalDespublicar 
+          isOpen={despublicarModalOpen} 
+          onClose={() => setDespublicarModalOpen(false)}
+          vehiculos={vehiculos}
+          onSuccess={fetchVehiculos} 
+        />
 
-        {/* MODAL DE BORRADO */}
+        {/* MODAL DE BORRADO INTEGRADO */}
         {matriculaABorrar && (
           <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center p-4 animate-fade-in">
             <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-6 text-center border border-gray-100 animate-fade-in">
-              <div className="w-16 h-16 mx-auto rounded-full bg-red-100 flex items-center justify-center mb-4">
+              <div className="w-16 h-16 mx-auto rounded-full bg-red-50 border border-red-100 flex items-center justify-center mb-4">
                 <svg className="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
                 </svg>
@@ -163,16 +208,23 @@ const Vehiculos = () => {
               <h3 className="text-2xl font-bold text-[#1A365D] mb-2">¿Eliminar vehículo?</h3>
               <p className="text-gray-500 mb-6 text-sm">Esta acción es irreversible y borrará todo el historial asociado a este coche.</p>
               
+              {/* Nuevo: Integración del error en el modal de borrado */}
+              {errorBorrado && (
+                 <div className="bg-red-50 text-red-600 p-2 rounded-lg text-sm mb-4">
+                   {errorBorrado}
+                 </div>
+              )}
+              
               <div className="flex gap-3 justify-center">
                 <button 
-                  onClick={() => setMatriculaABorrar(null)} 
+                  onClick={() => { setMatriculaABorrar(null); setErrorBorrado(''); }} 
                   className="px-4 py-3 bg-gray-100 text-gray-700 font-bold rounded-xl w-full hover:bg-gray-200 transition-colors"
                 >
                   Cancelar
                 </button>
                 <button 
                   onClick={confirmarBorradoVehiculo} 
-                  className="px-4 py-3 text-white bg-red-500 font-bold rounded-xl w-full hover:bg-red-600 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
+                  className="px-4 py-3 text-white bg-red-600 font-bold rounded-xl w-full hover:bg-red-700 transition-all shadow-sm hover:shadow-md hover:-translate-y-0.5"
                 >
                   Sí, eliminar
                 </button>
