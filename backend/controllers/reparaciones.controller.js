@@ -1,7 +1,7 @@
 const { PrismaClient } = require('@prisma/client');
 const prisma = new PrismaClient();
 
-// 2. Obtener todas las reparaciones (El GET que teníamos en index.js)
+// 1. Obtener todas las reparaciones (El GET que teníamos en index.js)
 const obtenerReparaciones = async (req, res) => {
   try {
     const reparaciones = await prisma.reparacion.findMany({

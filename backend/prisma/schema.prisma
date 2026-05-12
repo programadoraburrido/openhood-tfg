@@ -16,20 +16,30 @@ model Usuario {
   nombre    String
   email     String     @unique
   telefono  String?
+  password  String     
   vehiculos Vehiculo[]
+  foroTemas      ForoTema[]
+  foroRespuestas ForoRespuesta[]
 }
 
 model Vehiculo {
-  matricula    String       @id
-  marca        String
-  modelo       String
-  kilometraje  Int
+  matricula   String    @id
+  marca       String
+  modelo      String
+  anio        Int
+  kilometraje Int
+  fotoUrl     String?
   
-  usuarioId    Int
-  usuario      Usuario      @relation(fields: [usuarioId], references: [id])
+  // --- CAMPOS NUEVOS PARA MARKETPLACE ---
+  precio      Float?    // Precio de venta (opcional)
+  enVenta     Boolean   @default(false) // ¿Está en el marketplace?
+  // --------------------------------------
   
-  piezas       Pieza[]      // Relación N:M
-  reparaciones Reparacion[] // Relación 1:N
+  usuarioId   Int
+  usuario     Usuario   @relation(fields: [usuarioId], references: [id])
+  
+  piezas      Pieza[]
+  reparaciones Reparacion[]
 }
 
 model Taller {
@@ -85,4 +95,33 @@ model Presupuesto {
   // Relación 1 a 1 con Reparación
   reparacionId   Int        @unique
   reparacion     Reparacion @relation(fields: [reparacionId], references: [id], onDelete: Cascade)
+}
+
+model ForoTema {
+  id             Int             @id @default(autoincrement())
+  titulo         String
+  contenido      String          @db.Text
+  categoria      String
+  fecha_creacion DateTime        @default(now())
+
+  // Relación con el Usuario que crea el tema (N a 1)
+  usuarioId      Int
+  usuario        Usuario         @relation(fields: [usuarioId], references: [id])
+
+  // Relación con las respuestas (1 a N)
+  respuestas     ForoRespuesta[]
+}
+
+model ForoRespuesta {
+  id             Int             @id @default(autoincrement())
+  contenido      String          @db.Text
+  fecha_creacion DateTime        @default(now())
+
+  // Relación con el Tema al que pertenece (N a 1)
+  temaId         Int
+  tema           ForoTema        @relation(fields: [temaId], references: [id], onDelete: Cascade)
+
+  // Relación con el Usuario que responde (N a 1)
+  usuarioId      Int
+  usuario        Usuario         @relation(fields: [usuarioId], references: [id])
 }

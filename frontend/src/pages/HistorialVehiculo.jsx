@@ -1,0 +1,370 @@
+import { useEffect, useState } from 'react';
+import { useParams, Link } from 'react-router-dom'; // <--- Importamos Link aquí
+import api from '../services/api';
+import FormularioReparacion from '../components/FormularioReparacion';
+import FormularioPresupuesto from '../components/FormularioPresupuesto';
+
+const HistorialVehiculo = () => {
+  const { matricula } = useParams();
+  const [historial, setHistorial] = useState([]);
+  const [vehiculo, setVehiculo] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [modalCrearReparacionOpen, setModalCrearReparacionOpen] = useState(false);
+  const [modalActualizarReparacion, setModalActualizarReparacion] = useState(null);
+  const [analizandoId, setAnalizandoId] = useState(null);
+  const [modalIA, setModalIA] = useState({ isOpen: false, contenido: '' });
+  const [modalError, setModalError] = useState({ isOpen: false, mensaje: '' });
+  const [reparacionABorrar, setReparacionABorrar] = useState(null);
+  const [modalPresupuestoOpen, setModalPresupuestoOpen] = useState(false);
+  const [modalActualizarPresupuesto, setModalActualizarPresupuesto] = useState(null);
+  const [reparacionIdActiva, setReparacionIdActiva] = useState(null);
+  const [presupuestoABorrar, setPresupuestoABorrar] = useState(null);
+
+  useEffect(() => {
+    const cargarDatos = async () => {
+      try {
+        const resReparaciones = await api.get(`/reparaciones/vehiculo/${matricula}`);
+        setHistorial(resReparaciones.data);
+
+        const resVehiculo = await api.get(`/vehiculos/${matricula}`);
+        setVehiculo(resVehiculo.data);
+
+      } catch (err) {
+        console.error(err);
+        setError('No se pudo cargar la información del vehículo.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (matricula) cargarDatos();
+  }, [matricula]);
+
+  const analizarPresupuesto = async (presupuestoId) => {
+    setAnalizandoId(presupuestoId);
+    try {
+      const response = await api.get(`/comparador/${presupuestoId}/analizar`);
+      setModalIA({ isOpen: true, contenido: response.data.veredicto_ia });
+    } catch (error) {
+      console.error("Error al analizar. Contacta con soporte técnico", error);
+      setModalError({ 
+        isOpen: true, 
+        mensaje: "El perito está descansando ahora mismo. Por favor, inténtalo de nuevo en unos minutos." 
+      });
+    } finally {
+      setAnalizandoId(null);
+    }
+  };
+
+  const intentarBorrar = (id) => {
+    setReparacionABorrar(id);
+  };
+
+  const confirmarBorrado = async () => {
+    if (!reparacionABorrar) return;
+
+    try {
+      await api.delete(`/reparaciones/${reparacionABorrar}`);
+      setHistorial(historial.filter(reparacion => reparacion.id !== reparacionABorrar));
+      setReparacionABorrar(null);
+    } catch (error) {
+      console.error("Error al borrar:", error);
+      alert("Hubo un error al intentar borrar la reparación.");
+    }
+  };
+
+  const confirmarBorradoPresupuesto = async () => {
+    if (!presupuestoABorrar) return;
+
+    try {
+      await api.delete(`/presupuestos/${presupuestoABorrar}`);
+      setHistorial(historial.map(rep => {
+          if (rep.presupuesto?.id === presupuestoABorrar) {
+              return { ...rep, presupuesto: null };
+          }
+          return rep;
+      }));
+      setPresupuestoABorrar(null);
+    } catch (error) {
+      console.error("Error al borrar presupuesto:", error);
+      alert("Hubo un error al intentar borrar el presupuesto.");
+    }
+  };
+
+  return (
+    <div className="p-8 relative">
+      <div className="max-w-5xl mx-auto">
+        
+        {/* BOTÓN VOLVER: Integrado para mejorar la navegación */}
+        <Link 
+          to="/vehiculos" 
+          className="inline-flex items-center gap-2 text-gray-500 hover:text-blue-600 mb-6 transition font-medium text-sm"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+          </svg>
+          Volver a mis vehículos
+        </Link>
+        
+        {/* CABECERA */}
+        <div className="bg-white p-6 rounded-lg shadow-md mb-8 border-l-4 border-blue-600 flex justify-between items-center">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-800">
+              Historial del Vehículo
+            </h1>
+            {vehiculo && (
+                <h3 className="text-lg text-gray-500 mt-2 font-medium flex items-center gap-2">
+                    <span>{vehiculo.marca} {vehiculo.modelo} • {matricula} • {vehiculo.kilometraje} Km</span>
+                </h3>
+            )}
+          </div>
+          
+          <button 
+            onClick={() => {
+                setModalActualizarReparacion(null);
+                setModalCrearReparacionOpen(true); 
+            }}
+            className="bg-blue-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-blue-700 transition flex items-center gap-2 shadow-sm"
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4"></path></svg>
+            Nueva Reparación
+          </button>
+        </div>
+
+        {loading && <div className="text-center text-gray-600 my-8 animate-pulse">Cargando datos...</div>}
+        {error && !loading && <div className="bg-red-100 text-red-700 p-4 rounded-md mb-6">{error}</div>}
+
+        {/* LISTA DE REPARACIONES */}
+        {!loading && historial.length > 0 && (
+          <div className="space-y-6">
+            {historial.map((reparacion) => (
+              <div key={reparacion.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex justify-between items-start mb-4 pb-4 border-b border-gray-100">
+                  <div>
+                    <span className="text-sm font-medium text-blue-600 bg-blue-50 px-2 py-1 rounded-full">
+                      {new Date(reparacion.fecha).toLocaleDateString()}
+                    </span>
+                    <h3 className="text-xl font-bold text-gray-800 mt-3">{reparacion.descripcion}</h3>
+                    <p className="text-sm text-gray-600 mt-1">Kilometraje: {reparacion.kilometraje_momento} km  |  Taller: {reparacion.taller_nombre}</p>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => {
+                          setModalActualizarReparacion(reparacion); 
+                          setModalCrearReparacionOpen(true);
+                      }} 
+                      className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition group"  title="Editar Reparación"
+                    >
+                      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                        className="transition-transform duration-200 group-hover:-rotate-12 group-hover:scale-110">
+                        <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                      </svg>
+                    </button>
+                 <button 
+  onClick={() => intentarBorrar(reparacion.id)} 
+  className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" 
+  title="Borrar Reparación"
+>
+  {/* El diseño es 100% igual. Solo añadimos pointer-events-none para que el icono no robe el clic */}
+  <svg 
+    className="pointer-events-none" 
+    xmlns="http://www.w3.org/2000/svg" 
+    width="20" 
+    height="20" 
+    viewBox="0 0 24 24" 
+    fill="none" 
+    stroke="#DC2626" 
+    strokeWidth="2" 
+    strokeLinecap="round" 
+    strokeLinejoin="round"
+  >
+    <polyline points="3,6 5,6 21,6"/>
+    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+    <path d="M10 11v6"/>
+    <path d="M14 11v6"/>
+    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+  </svg>
+</button>
+                                    </div>
+                </div>
+                
+                <div className="bg-gray-50 p-4 rounded-md flex justify-between items-center">
+                    {reparacion.presupuesto ? (
+                        <>
+                            <div>
+                                <span className="block text-2xl font-bold text-gray-900">
+                                {reparacion.presupuesto.importe_total}€
+                                </span>
+                                <span className="text-xs text-gray-500">IVA incluido</span>
+                            </div>
+                            <div className="flex items-center gap-3">
+                                <button onClick={() => {
+                                    setReparacionIdActiva(reparacion.id);
+                                    setModalActualizarPresupuesto(reparacion.presupuesto);
+                                    setModalPresupuestoOpen(true);
+                                }} className="p-2 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition" title="Editar Presupuesto">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                                </button>
+                               <button 
+    onClick={() => setPresupuestoABorrar(reparacion.presupuesto.id)} 
+    className="p-2 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-md transition" 
+    title="Borrar Presupuesto"
+>
+    {/* AQUÍ HE AÑADIDO: className="pointer-events-none" */}
+    <svg className="pointer-events-none" xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polyline points="3,6 5,6 21,6"/>
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+        <path d="M10 11v6"/>
+        <path d="M14 11v6"/>
+        <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+    </svg>
+</button>
+                                <button 
+                                    onClick={() => analizarPresupuesto(reparacion.presupuesto.id)}
+                                    disabled={analizandoId === reparacion.presupuesto.id}
+                                    className={`flex items-center gap-2 text-sm px-4 py-2 rounded-md font-medium transition-colors ml-2
+                                        ${analizandoId === reparacion.presupuesto.id ? 'bg-gray-200 text-gray-500' : 'bg-purple-600 text-white hover:bg-purple-700'}`}
+                                >
+                                    {analizandoId === reparacion.presupuesto.id ? 'Peritando...' : 'Peritación IA'}
+                                </button>
+                            </div>
+                        </>
+                    ) : (
+                        <div className="w-full flex justify-between items-center">
+                            <span className="text-gray-500 italic">No hay presupuesto asociado.</span>
+                            <button 
+                                onClick={() => {
+                                    setReparacionIdActiva(reparacion.id);
+                                    setModalActualizarPresupuesto(null);
+                                    setModalPresupuestoOpen(true);
+                                }}
+                                className="bg-green-100 text-green-700 px-4 py-2 rounded-md hover:bg-green-200 transition font-medium text-sm"
+                            >
+                                + Añadir Presupuesto
+                            </button>
+                        </div>
+                    )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* MODAL DE PERITACIÓN IA*/}
+      {modalIA.isOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+            <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full overflow-hidden">
+                <div className="bg-purple-600 p-4 flex justify-between items-center text-white">
+                    <h3 className="text-lg font-bold">Veredicto del Perito</h3>
+                    <button onClick={() => setModalIA({ isOpen: false, contenido: '' })} className="text-white hover:text-purple-200">X</button>
+                </div>
+                <div className="p-6 max-h-[70vh] overflow-y-auto text-gray-700 whitespace-pre-line leading-relaxed">
+                    {modalIA.contenido}
+                </div>
+            </div>
+        </div>
+      )}
+
+     {/* --- AQUÍ TERMINAN LOS FORMULARIOS Y EMPIEZAN LOS MODALES --- */}
+      
+      <FormularioReparacion 
+        isOpen={modalCrearReparacionOpen} 
+        onClose={() => setModalCrearReparacionOpen(false)} 
+        matricula={matricula}
+        reparacionAEditar={modalActualizarReparacion} 
+        onSuccess={() => window.location.reload()}
+      />
+
+      <FormularioPresupuesto 
+        isOpen={modalPresupuestoOpen} 
+        onClose={() => setModalPresupuestoOpen(false)} 
+        reparacionId={reparacionIdActiva}
+        presupuestoAEditar={modalActualizarPresupuesto} 
+        onSuccess={() => window.location.reload()}
+      />
+      {/* MODAL DE CONFIRMACIÓN DE BORRADO DE REPARACIÓN */}
+      {reparacionABorrar && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden text-center p-6 transform transition-all animate-fade-in-up">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">¿Eliminar reparación?</h3>
+            <p className="text-gray-500 mb-8 text-sm px-2">
+              Esta acción no se puede deshacer. Se eliminarán permanentemente los datos de la avería.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button 
+                onClick={() => setReparacionABorrar(null)}
+                className="px-4 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition font-medium w-full"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={confirmarBorrado}
+                className="px-4 py-2.5 text-white bg-red-600 hover:bg-red-700 rounded-xl transition font-medium w-full shadow-sm"
+              >
+                Sí, eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* MODAL DE CONFIRMACIÓN DE BORRADO DE PRESUPUESTO */}
+      {presupuestoABorrar && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden text-center p-6 transform transition-all animate-fade-in-up">
+            <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-5">
+              <svg className="w-10 h-10 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+              </svg>
+            </div>
+            <h3 className="text-2xl font-bold text-gray-800 mb-2">¿Eliminar presupuesto?</h3>
+            <p className="text-gray-500 mb-8 text-sm px-2">
+              Esta acción no se puede deshacer. Se eliminarán los datos financieros asociados a esta reparación.
+            </p>
+            <div className="flex gap-3 justify-center">
+              <button 
+                onClick={() => setPresupuestoABorrar(null)}
+                className="px-4 py-2.5 text-gray-600 bg-gray-100 hover:bg-gray-200 rounded-xl transition font-medium w-full"
+              >
+                Cancelar
+              </button>
+              <button 
+                onClick={confirmarBorradoPresupuesto}
+                className="px-4 py-2.5 text-white bg-red-600 hover:bg-red-700 rounded-xl transition font-medium w-full shadow-sm flex justify-center items-center gap-2"
+              >
+                Sí, eliminar
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* MODAL DE ERROR */}
+      {modalError.isOpen && (
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex justify-center items-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full overflow-hidden text-center p-6">
+            <h3 className="text-xl font-bold text-red-600 mb-4">Error</h3>
+            <p className="text-gray-600 mb-6">{modalError.mensaje}</p>
+            <button 
+              onClick={() => setModalError({ isOpen: false, mensaje: '' })}
+              className="bg-gray-800 text-white px-6 py-2 rounded-lg"
+            >
+              Entendido
+            </button>
+          </div>
+        </div>
+      )}
+      
+    </div>
+  );
+};
+
+export default HistorialVehiculo;

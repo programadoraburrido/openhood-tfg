@@ -83,6 +83,24 @@ const eliminarPresupuesto = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // 1. Buscamos el presupuesto y verificamos la propiedad a través de la relación:
+    // Presupuesto -> Reparacion -> Vehiculo -> Usuario
+    const presupuesto = await prisma.presupuesto.findFirst({
+      where: { 
+        id: parseInt(id),
+        reparacion: {
+            vehiculo: {
+                usuarioId: req.user.id
+            }
+        }
+      },
+    });
+
+    if (!presupuesto) {
+      return res.status(404).json({ error: 'No tienes permiso para borrar este presupuesto o no existe' });
+    }
+
+    // 2. Si lo encontramos, lo borramos
     await prisma.presupuesto.delete({
       where: { id: parseInt(id) },
     });
@@ -93,7 +111,6 @@ const eliminarPresupuesto = async (req, res) => {
     res.status(500).json({ error: 'Error al eliminar el presupuesto' });
   }
 };
-
 // 5. Subir PDF del presupuesto
 const subirPdf = async (req, res) => {
   try {

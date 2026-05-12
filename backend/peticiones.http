@@ -63,8 +63,6 @@ Content-Type: application/json
 DELETE http://localhost:3000/api/presupuestos/12
 
 ### 5. Subir PDF a un presupuesto (Multipart Form)
-### Debemos crear un presupuesto asignado a una reparacion, cambiamos el id
-### y en la base de datos se comprueba que la url_pdf ha cambiado
 POST http://localhost:3000/api/presupuestos/16/pdf
 Content-Type: multipart/form-data; boundary=MiLimiteDeArchivo
 
@@ -75,3 +73,68 @@ Content-Type: application/pdf
 < holiwisssssssssssssss
 --MiLimiteDeArchivo--
 
+####################
+## IDENTIDAD (JOSE) ##
+####################
+
+@token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiZW1haWwiOiJqb3NlQG9wZW5ob29kLmNvbSIsImlhdCI6MTc3NzM2MzI5MiwiZXhwIjoxNzc3NDQ5NjkyfQ.9x5qutZnj4_GYhRgm2MYJTbIU8T8QrR8EfN-U6M6nLg
+
+### 1. Registrar un nuevo usuario (POST)
+POST http://localhost:3000/api/auth/register
+Content-Type: application/json
+
+{
+  "nombre": "Jose",
+  "email": "jose@openhood.com",
+  "telefono": "600123456",
+  "password": "miPasswordSegura123"
+}
+
+### Login de usuario (EJECUTA ESTE PRIMERO)
+# @name login 
+POST http://localhost:3000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "jose@openhood.com",
+  "password": "miPasswordSegura123"
+}
+
+### Obtener mis vehículos
+GET http://localhost:3000/api/vehiculos
+Authorization: Bearer {{login.response.body.token}}
+
+### Crear un vehículo
+POST http://localhost:3000/api/vehiculos
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "matricula": "7788KFC",
+  "marca": "Seat",
+  "modelo": "Ibiza",
+  "año": 2018,
+  "kilometraje": 85000
+}
+
+### Listar todos mis coches
+GET http://localhost:3000/api/vehiculos
+Authorization: Bearer {{login.response.body.token}}
+
+### Ver un coche específico 
+GET http://localhost:3000/api/vehiculos/7784KFC
+Authorization: Bearer {{login.response.body.token}}
+
+### Borrar un coche
+DELETE http://localhost:3000/api/vehiculos/7788KFC
+Authorization: Bearer {{login.response.body.token}}
+
+### Probar el UPDATE (Actualizar kilometraje y modelo)
+PUT http://localhost:3000/api/vehiculos/7788KFC
+Content-Type: application/json
+Authorization: Bearer {{login.response.body.token}}
+
+{
+  "kilometraje": 95000,
+  "modelo": "Ibiza FR"
+}
