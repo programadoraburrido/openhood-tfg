@@ -18,12 +18,13 @@ exports.getUserVehicles = async (req, res) => {
     }
 };
 
-// 2. Manejar el flujo de chat
+// 2. Manejar el flujo de chat (CONEXIÓN CON TALLERES)
 exports.handleChat = async (req, res) => {
-    const { contenido, usuarioId, vehiculoMatricula } = req.body;
+    // Recibimos lat y lng desde el frontend
+    const { contenido, usuarioId, vehiculoMatricula, lat, lng } = req.body;
 
     try {
-        // Buscamos los datos técnicos del coche actual para la IA
+        // A. Datos del coche
         let datosCoche = null;
         if (vehiculoMatricula) {
             datosCoche = await prisma.vehiculo.findUnique({
@@ -31,14 +32,27 @@ exports.handleChat = async (req, res) => {
             });
         }
 
-        // Recuperamos el historial de este usuario
+        // B. Búsqueda de talleres cercanos si tenemos ubicación
+        let talleresCercanos = [];
+        if (lat && lng) {
+            talleresCercanos = await prisma.$queryRaw`
+                SELECT id, nombre, direccion, telefono,
+                (6371 * acos(cos(radians(${lat})) * cos(radians(latitud)) * cos(radians(longitud) - radians(${lng})) + sin(radians(${lat})) * sin(radians(latitud)))) AS distance
+                FROM Taller
+                HAVING distance < 50
+                ORDER BY distance ASC
+                LIMIT 3
+            `;
+        }
+
+        // C. Historial previo
         const historialPrevio = await prisma.mensaje.findMany({
             where: { usuarioId: parseInt(usuarioId) },
             orderBy: { fecha: 'asc' },
             take: 10
         });
 
-        // Guardar mensaje del usuario
+        // D. Guardar mensaje del usuario
         await prisma.mensaje.create({
             data: {
                 contenido,
@@ -48,10 +62,15 @@ exports.handleChat = async (req, res) => {
             }
         });
 
-        // Llamada al servicio de IA (Groq) con los datos del coche actual
-        const respuestaIA = await chatbotService.generarRespuestaMecanico(historialPrevio, contenido, datosCoche);
+        // E. Llamada al servicio de IA pasando también los TALLERES
+        const respuestaIA = await chatbotService.generarRespuestaMecanico(
+            historialPrevio, 
+            contenido, 
+            datosCoche, 
+            talleresCercanos
+        );
 
-        // Guardar respuesta de la IA
+        // F. Guardar respuesta de la IA
         const mensajeAsistente = await prisma.mensaje.create({
             data: {
                 contenido: respuestaIA,

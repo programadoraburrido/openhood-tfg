@@ -10,6 +10,7 @@ const comparadorIARoutes = require('./routes/comparadorIA.routes');
 const authRoutes = require('./routes/auth.routes');
 const vehiculoRoutes = require('./routes/vehiculo.routes');
 const foroRoutes = require('./routes/foro.routes');
+const tallerRoutes = require('./routes/talleres.routes');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,8 +27,14 @@ app.use('/api/presupuestos', presupuestosRoutes);
 app.use('/api/comparador', comparadorIARoutes);
 app.use('/api/auth', authRoutes); 
 app.use('/api/vehiculos', vehiculoRoutes);
+<<<<<<< feature/directorioTaller
+app.use('/api/chat', chatRoutes); 
+app.use('/api/foro', foroRoutes);
+app.use('/api/talleres', tallerRoutes);
+=======
 app.use('/api/chat', chatRoutes);
 app.use('/api/foro', foroRoutes); 
+>>>>>>> develop
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);

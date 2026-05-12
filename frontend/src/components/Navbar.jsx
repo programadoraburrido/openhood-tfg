@@ -10,15 +10,15 @@ const Navbar = () => {
 
   const handleLogout = () => {
     // Borramos el token y redirigimos al login
-  localStorage.removeItem('usuarioId');
-  localStorage.removeItem('token');
-  localStorage.removeItem('matriculaActiva');
+    localStorage.removeItem('usuarioId');
+    localStorage.removeItem('token');
+    localStorage.removeItem('matriculaActiva');
     setIsLoggedIn(false);
     navigate('/login'); 
   };
 
   return (
-    // Aplicamos el bg-blue-500 que pediste
+    // Aplicamos el bg-white y texto blanco (aunque los links son azules)
     <nav className="bg-white text-white shadow-md sticky top-0 z-40">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
@@ -48,6 +48,12 @@ const Navbar = () => {
                 <Link to="/foro" className="text-blue-600 hover:text-blue-700 font-medium transition">
                   Foro
                 </Link>
+                
+                {/* NUEVO ENLACE AL DIRECTORIO DE TALLERES */}
+                <Link to="/talleres" className="text-blue-600 hover:text-blue-700 font-medium transition">
+                  Talleres
+                </Link>
+
                 <Link to="/perfil" className="text-blue-600 hover:text-blue-700 font-medium transition">
                   Mi Perfil
                 </Link>
