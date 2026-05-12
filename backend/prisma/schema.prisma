@@ -42,10 +42,7 @@ model Vehiculo {
   
   usuarioId   Int
   usuario     Usuario   @relation(fields: [usuarioId], references: [id])
-  
-  piezas      Pieza[]
-  reparaciones Reparacion[]
-}
+  }
 
 model Taller {
   id           Int          @id @default(autoincrement())
