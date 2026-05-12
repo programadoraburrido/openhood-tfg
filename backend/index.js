@@ -26,7 +26,8 @@ app.use('/api/presupuestos', presupuestosRoutes);
 app.use('/api/comparador', comparadorIARoutes);
 app.use('/api/auth', authRoutes); 
 app.use('/api/vehiculos', vehiculoRoutes);
-app.use('/api/chat', chatRoutes); 
+app.use('/api/chat', chatRoutes);
+app.use('/api/foro', foroRoutes); 
 
 app.listen(PORT, () => {
   console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
